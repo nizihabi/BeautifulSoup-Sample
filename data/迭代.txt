@@ -1,0 +1,36 @@
+for (i=0; i<list.length; i++) {
+    n = list[i];
+}
+list这种数据类型虽然有下标，但很多其他数据类型是没有下标的，但是，只要是可迭代对象，无论有无下标，都可以迭代，比如dict就可以迭代：>>> d = {'a': 1, 'b': 2, 'c': 3}
+>>> for key in d:
+...     print(key)
+...
+a
+c
+b
+因为dict的存储不是按照list的方式顺序排列，所以，迭代出的结果顺序很可能不一样。>>> for ch in 'ABC':
+...     print(ch)
+...
+A
+B
+C
+那么，如何判断一个对象是可迭代对象呢？方法是通过collections模块的Iterable类型判断：>>> from collections import Iterable
+>>> isinstance('abc', Iterable) # str是否可迭代
+True
+>>> isinstance([1,2,3], Iterable) # list是否可迭代
+True
+>>> isinstance(123, Iterable) # 整数是否可迭代
+False
+>>> for i, value in enumerate(['A', 'B', 'C']):
+...     print(i, value)
+...
+0 A
+1 B
+2 C
+>>> for x, y in [(1, 1), (2, 4), (3, 9)]:
+...     print(x, y)
+...
+1 1
+2 4
+3 9
+do_iter.pydo_iter.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/advance/do_iter.py

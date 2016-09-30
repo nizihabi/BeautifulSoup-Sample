@@ -1,0 +1,10 @@
+在Python的交互式命令行写程序，好处是一下就能得到结果，坏处是没法保存，下次还想运行的时候，还得再敲一遍。所以，实际开发的时候，我们总是使用一个文本编辑器来写代码，写完了，保存为一个文件，这样，程序就可以反复运行了。那么问题来了：文本编辑器到底哪家强？推荐两款文本编辑器：Sublime Texthttp://www.sublimetext.com/Notepad++http://notepad-plus-plus.org/绝对不能用Word和Windows自带的记事本安装好文本编辑器后，输入以下代码：print('hello, world')
+C:\work>python hello.py
+hello, world
+C:\Users\IEUser>python hello.py
+python: can't open file 'hello.py': [Errno 2] No such file or directory
+视频演示：#!/usr/bin/env python3
+
+print('hello, world')
+$ chmod a+x hello.py
+用Python开发程序，完全可以一边在文本编辑器里写代码，一边开一个交互式命令窗口，在写代码的过程中，把部分代码粘到命令行去验证，事半功倍！前提是得有个27'的超大显示器！hello.pyhello.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/basic/hello.py

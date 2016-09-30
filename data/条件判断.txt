@@ -1,0 +1,62 @@
+计算机之所以能做很多自动化的任务，因为它可以自己做条件判断。age = 20
+if age >= 18:
+    print('your age is', age)
+    print('adult')
+age = 3
+if age >= 18:
+    print('your age is', age)
+    print('adult')
+else:
+    print('your age is', age)
+    print('teenager')
+age = 3
+if age >= 18:
+    print('adult')
+elif age >= 6:
+    print('teenager')
+else:
+    print('kid')
+if <条件判断1>:
+    <执行1>
+elif <条件判断2>:
+    <执行2>
+elif <条件判断3>:
+    <执行3>
+else:
+    <执行4>
+age = 20
+if age >= 6:
+    print('teenager')
+elif age >= 18:
+    print('adult')
+else:
+    print('kid')
+if x:
+    print('True')
+birth = input('birth: ')
+if birth < 2000:
+    print('00前')
+else:
+    print('00后')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: unorderable types: str() > int()
+s = input('birth: ')
+birth = int(s)
+if birth < 2000:
+    print('00前')
+else:
+    print('00后')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ValueError: invalid literal for int() with base 10: 'abc'
+如何检查并捕获程序运行期的错误呢？后面的错误和调试会讲到。小明身高1.75，体重80.5kg。请根据BMI公式（体重除以身高的平方）帮小明计算他的BMI指数，并根据BMI指数：低于18.5：过轻18.5-25：正常25-28：过重28-32：肥胖高于32：严重肥胖
+# -*- coding: utf-8 -*-
+
+height = 1.75
+weight = 80.5
+----
+bmi = ???
+if ???:
+    pass
+条件判断可以让计算机自己做选择，Python的if...elif...else很灵活。do_if.pydo_if.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/basic/do_if.py

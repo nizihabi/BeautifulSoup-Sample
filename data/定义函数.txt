@@ -1,0 +1,62 @@
+def my_abs(x):
+    if x >= 0:
+        return x
+    else:
+        return -x
+模块/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014318447437605e90206e261744c08630a836851f5183000def nop():
+    pass
+if age >= 18:
+    pass
+>>> my_abs(1, 2)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: my_abs() takes 1 positional argument but 2 were given
+>>> my_abs('A')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 2, in my_abs
+TypeError: unorderable types: str() >= int()
+>>> abs('A')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: bad operand type for abs(): 'str'
+def my_abs(x):
+    if not isinstance(x, (int, float)):
+        raise TypeError('bad operand type')
+    if x >= 0:
+        return x
+    else:
+        return -x
+添加了参数检查后，如果传入错误的参数类型，函数就可以抛出一个错误：>>> my_abs('A')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 3, in my_abs
+TypeError: bad operand type
+错误和异常处理将在后续讲到。函数可以返回多个值吗？答案是肯定的。比如在游戏中经常需要从一个点移动到另一个点，给出坐标、位移和角度，就可以计算出新的新的坐标：import math
+
+def move(x, y, step, angle=0):
+    nx = x + step * math.cos(angle)
+    ny = y - step * math.sin(angle)
+    return nx, ny
+然后，我们就可以同时获得返回值：>>> x, y = move(100, 100, 60, math.pi / 6)
+>>> print(x, y)
+151.96152422706632 70.0
+但其实这只是一种假象，Python函数返回的仍然是单一值：>>> r = move(100, 100, 60, math.pi / 6)
+>>> print(r)
+(151.96152422706632, 70.0)
+原来返回值是一个tuple！但是，在语法上，返回一个tuple可以省略括号，而多个变量可以同时接收一个tuple，按位置赋给对应的值，所以，Python的函数返回多值其实就是返回一个tuple，但写起来更方便。定义函数时，需要确定函数名和参数个数；如果有必要，可以先对参数的数据类型做检查；函数可以同时返回多个值，但其实就是一个tuple。2的两个解。>>> import math
+>>> math.sqrt(2)
+1.4142135623730951
+
+# -*- coding: utf-8 -*-
+
+import math
+
+def quadratic(a, b, c):
+----
+    pass
+----
+# 测试:
+print(quadratic(2, 3, 1)) # => (-0.5, -1.0)
+print(quadratic(1, 3, -4)) # => (1.0, -4.0)
+def_func.pydef_func.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/function/def_func.py

@@ -1,0 +1,28 @@
+高阶函数英文叫Higher-order function。什么是高阶函数？我们以实际代码为例子，一步一步深入概念。>>> abs(-10)
+10
+>>> abs
+<built-in function abs>
+要获得函数调用结果，我们可以把结果赋值给变量：>>> x = abs(-10)
+>>> x
+10
+但是，如果把函数本身赋值给变量呢？>>> f = abs
+>>> f
+<built-in function abs>
+结论：函数本身也可以赋值给变量，即：变量可以指向函数。如果一个变量指向了一个函数，那么，可否通过该变量来调用这个函数？用代码验证一下：>>> f = abs
+>>> f(-10)
+10
+>>> abs = 10
+>>> abs(-10)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: 'int' object is not callable
+既然变量可以指向函数，函数的参数能接收变量，那么一个函数就可以接收另一个函数作为参数，这种函数就称之为高阶函数。一个最简单的高阶函数：def add(x, y, f):
+    return f(x) + f(y)
+x = -5
+y = 6
+f = abs
+f(x) + f(y) ==> abs(-5) + abs(6) ==> 11
+return 11
+用代码验证一下：>>> add(-5, 6, abs)
+11
+编写高阶函数，就是让函数的参数能够接收别的函数。把函数作为参数传入，这样的函数称为高阶函数，函数式编程就是指这种高度抽象的编程范式。
