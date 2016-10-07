@@ -1,0 +1,134 @@
+用JavaScript操作表单和操作DOM是类似的，因为表单本身也是DOM树。不过表单的输入框、下拉框等可以接收用户输入，所以用JavaScript来操作表单，可以获得用户输入的内容，或者对一个输入框设置新的内容。HTML表单的输入控件主要有以下几种：// <input type="text" id="email">
+var input = document.getElementById('email');
+input.value; // '用户输入的值'
+// <label><input type="radio" name="weekday" id="monday" value="1"> Monday</label>
+// <label><input type="radio" name="weekday" id="tuesday" value="2"> Tuesday</label>
+var mon = document.getElementById('monday');
+var tue = document.getElementById('tuesday');
+mon.value; // '1'
+tue.value; // '2'
+mon.checked; // true或者false
+tue.checked; // true或者false
+// <input type="text" id="email">
+var input = document.getElementById('email');
+input.value = 'test@example.com'; // 文本框的内容已更新
+<input type="date" value="2015-07-01">
+<input type="datetime-local" value="2015-07-01T02:03:04">
+<input type="color" value="#ff0000">
+最后，JavaScript可以以两种方式来处理表单的提交（AJAX方式在后面章节介绍）。<!-- HTML -->
+<form id="test-form">
+    <input type="text" name="test">
+    <button type="button" onclick="doSubmitForm()">Submit</button>
+</form>
+
+<script>
+function doSubmitForm() {
+    var form = document.getElementById('test-form');
+    // 可以在此修改form的input...
+    // 提交form:
+    form.submit();
+}
+</script>
+<!-- HTML -->
+<form id="test-form" onsubmit="return checkForm()">
+    <input type="text" name="test">
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+function checkForm() {
+    var form = document.getElementById('test-form');
+    // 可以在此修改form的input...
+    // 继续下一步:
+    return true;
+}
+</script>
+<!-- HTML -->
+<form id="login-form" method="post" onsubmit="return checkForm()">
+    <input type="text" id="username" name="username">
+    <input type="password" id="password" name="password">
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+function checkForm() {
+    var pwd = document.getElementById('password');
+    // 把用户输入的明文变为MD5:
+    pwd.value = toMD5(pwd.value);
+    // 继续下一步:
+    return true;
+}
+</script>
+<!-- HTML -->
+<form id="login-form" method="post" onsubmit="return checkForm()">
+    <input type="text" id="username" name="username">
+    <input type="password" id="input-password">
+    <input type="hidden" id="md5-password" name="password">
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+function checkForm() {
+    var input_pwd = document.getElementById('input-password');
+    var md5_pwd = document.getElementById('md5-password');
+    // 把用户输入的明文变为MD5:
+    md5_pwd.value = toMD5(input_pwd.value);
+    // 继续下一步:
+    return true;
+}
+</script>
+利用JavaScript检查用户注册信息是否正确，在以下情况不满足时报错并阻止提交表单：用户名必须是3-10位英文字母或数字；口令必须是6-20位；两次输入口令必须一致。<!-- HTML结构 -->
+<form id="test-register" action="#" target="_blank" onsubmit="return checkRegisterForm()">
+    <p id="test-error" style="color:red"></p>
+    <p>
+        用户名: <input type="text" id="username" name="username">
+    </p>
+    <p>
+        口令: <input type="password" id="password" name="password">
+    </p>
+    <p>
+        重复口令: <input type="password" id="password-2">
+    </p>
+    <p>
+        <button type="submit">提交</button> <button type="reset">重置</button>
+    </p>
+</form>
+
+
+
+
+window.testFormHandler = function () {
+    return false;
+}
+
+function checkForm() {
+    var r = window.testFormHandler();
+    if (r === false) {
+        console.log('checkRegisterForm() return false!');
+    } else {
+        alert('Form可以正常提交！');
+    }
+    return r;
+}
+
+'use strict';
+var checkRegisterForm = function () {
+----
+    // TODO:
+    return false;
+}
+----
+// 测试:
+;(function () {
+    window.testFormHandler = checkRegisterForm;
+    var form = document.getElementById('test-register');
+    if (form.dispatchEvent) {
+        var event = new Event('submit', {
+            bubbles: true,
+            cancelable: true
+          });
+        form.dispatchEvent(event);
+    } else {
+        form.fireEvent('onsubmit');
+    }
+})();

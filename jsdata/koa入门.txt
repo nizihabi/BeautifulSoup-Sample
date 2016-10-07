@@ -1,0 +1,129 @@
+// 导入koa，和koa 1.x不同，在koa2中，我们导入的是一个class，因此用大写的Koa表示:
+const Koa = require('koa');
+
+// 创建一个Koa对象表示web app本身:
+const app = new Koa();
+
+// 对于任何请求，app将调用该异步函数处理请求：
+app.use(async (ctx, next) => {
+    await next();
+    ctx.response.type = 'text/html';
+    ctx.response.body = '<h1>Hello, koa2!</h1>';
+});
+
+// 在端口3000监听:
+app.listen(3000);
+console.log('app started at port 3000...');
+对于每一个http请求，koa将调用我们传入的异步函数来处理：async (ctx, next) => {
+    await next();
+    // 设置response的Content-Type:
+    ctx.response.type = 'text/html';
+    // 设置response的内容:
+    ctx.response.body = '<h1>Hello, koa2!</h1>';
+}
+C:\...\hello-koa> npm install koa@2.0.0
+npm会把koa2以及koa2依赖的所有包全部安装到当前目录的node_modules目录下。{
+    "name": "hello-koa2",
+    "version": "1.0.0",
+    "description": "Hello Koa 2 example with async",
+    "main": "start.js",
+    "scripts": {
+        "start": "node start.js"
+    },
+    "keywords": [
+        "koa",
+        "async"
+    ],
+    "author": "Michael Liao",
+    "license": "Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/michaelliao/learn-javascript.git"
+    },
+    "dependencies": {
+        "babel-core": "6.13.2",
+        "babel-polyfill": "6.13.0",
+        "babel-preset-es2015-node6": "0.3.0",
+        "babel-preset-stage-3": "6.5.0",
+        "koa": "2.0.0"
+    }
+}
+C:\...\hello-koa> npm install
+现在，我们的工程结构如下：hello-koa/
+|
++- .vscode/
+|  |
+|  +- launch.json <-- VSCode 配置文件
+|
++- app.js <-- 使用koa的js
+|
++- package.json <-- 项目描述文件
+|
++- node_modules/ <-- npm安装的所有依赖包
+app.use(async (ctx, next) => {
+              ^
+SyntaxError: Unexpected token (
+    at ...
+这是因为Node.js只支持ES6，并不支持ES7，无法识别新的async语法。要让Node.js运行ES7代码，需要把ES7代码“转换”为ES6代码，这样，Node.js就可以运行转换后的代码。这个转换工作可以用Babel实现。Babel是一个JavaScript编写的转码器，它可以把高版本的JavaScript代码转换成低版本的JavaScript代码，并保持逻辑不变，这样就可以在低版本的JavaScript环境下运行。例如，我们用ES7编写的JavaScript代码，用Babel转换成ES6以后，就可以在Node环境下执行。如果某些JavaScript代码需要在更低版本的环境下执行，例如IE 6，就可以用Babel转换成ES5的代码。plugins可以指定插件来定制转码过程，一个preset就包含了一组指定的plugin。在线转码工具https://babeljs.io/repl/var register = require('babel-core/register');
+
+register({
+    presets: ['stage-3']
+});
+
+require('./app.js');
+"dependencies": {
+    "babel-core": "6.13.2",
+    "babel-polyfill": "6.13.0",
+    "babel-preset-es2015-node6": "0.3.0",
+    "babel-preset-stage-3": "6.5.0",
+    "koa": "2.0.0"
+}
+node --debug-brk=40645 --nolazy start.js 
+Debugger listening on port 40645
+app started at port 3000...
+自定义的函数替换了浏览器的alert函数/wiki/001434446689867b27157e896e74d51a89c25cc8b43bdb3000/0014344993159773a464f34e1724700a6d5dd9e235ceb7c000hello-koa/
+|
++- .vscode/
+|  |
+|  +- launch.json <-- VSCode 配置文件
+|
++- app.js <-- 使用koa的js
+|
++- start.js <-- 启动入口js
+|
++- package.json <-- 项目描述文件
+|
++- node_modules/ <-- npm安装的所有依赖包
+"scripts": {
+    "start": "node start.js"
+}
+让我们再仔细看看koa的执行逻辑。核心代码是：app.use(async (ctx, next) => {
+    await next();
+    ctx.response.type = 'text/html';
+    ctx.response.body = '<h1>Hello, koa2!</h1>';
+});
+例如，可以用以下3个middleware组成处理链，依次打印日志，记录处理时间，输出HTML：app.use(async (ctx, next) => {
+    console.log(`${ctx.request.method} ${ctx.request.url}`); // 打印URL
+    await next(); // 调用下一个middleware
+});
+
+app.use(async (ctx, next) => {
+    const start = new Date().getTime(); // 当前时间
+    await next(); // 调用下一个middleware
+    const ms = new Date().getTime() - start; // 耗费时间
+    console.log(`Time: ${ms}ms`); // 打印耗费时间
+});
+
+app.use(async (ctx, next) => {
+    await next();
+    ctx.response.type = 'text/html';
+    ctx.response.body = '<h1>Hello, koa2!</h1>';
+});
+app.use(async (ctx, next) => {
+    if (await checkUserPermission(ctx)) {
+        await next();
+    } else {
+        ctx.response.status = 403;
+    }
+});
+理解了middleware，我们就已经会用koa了！hello-koahello-koahttps://github.com/michaelliao/learn-javascript/tree/master/samples/node/web/koa/hello-koa

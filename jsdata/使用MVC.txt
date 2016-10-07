@@ -1,0 +1,184 @@
+我们已经可以用koa处理不同的URL，还可以用Nunjucks渲染模板。现在，是时候把这两者结合起来了！当用户通过浏览器请求一个URL时，koa将调用某个异步函数处理该URL。在这个异步函数内部，我们用一行代码：ctx.render('home.html', { name: 'Michael' });
+通过Nunjucks把数据用指定的模板渲染成HTML，然后输出给浏览器，用户就可以看到渲染后的页面了：这就是传说中的MVC：Model-View-Controller，中文名“模型-视图-控制器”。异步函数是C：Controller，Controller负责业务逻辑，比如检查用户名是否存在，取出用户信息等等；MVC中的Model在哪？Model是用来传给View的，这样View在替换变量的时候，就可以从Model中取出相应的数据。上面的例子中，Model就是一个JavaScript对象：{ name: 'Michael' }
+view-koa/
+|
++- .vscode/
+|  |
+|  +- launch.json <-- VSCode 配置文件
+|
++- controllers/ <-- Controller
+|
++- views/ <-- html模板文件
+|
++- static/ <-- 静态资源文件
+|
++- controller.js <-- 扫描注册Controller
+|
++- app.js <-- 使用koa的js
+|
++- start.js <-- 启动入口js
+|
++- package.json <-- 项目描述文件
+|
++- node_modules/ <-- npm安装的所有依赖包
+"babel-core": "6.13.2",
+"babel-polyfill": "6.13.0",
+"babel-preset-es2015-node6": "0.3.0",
+"babel-preset-stage-3": "6.5.0",
+"koa": "2.0.0",
+"koa-bodyparser": "3.2.0",
+"koa-router": "7.0.0",
+"nunjucks": "2.4.2",
+"mime": "1.3.4",
+"mz": "2.4.0"
+然后，我们准备编写以下两个Controller：async (ctx, next) => {
+    ctx.render('index.html', {
+        title: 'Welcome'
+    });
+}
+async (ctx, next) => {
+    var
+        email = ctx.request.body.email || '',
+        password = ctx.request.body.password || '';
+    if (email === 'admin@example.com' && password === '123456') {
+        // 登录成功:
+        ctx.render('signin-ok.html', {
+            title: 'Sign In OK',
+            name: 'Mr Node'
+        });
+    } else {
+        // 登录失败:
+        ctx.render('signin-failed.html', {
+            title: 'Sign In Failed'
+        });
+    }
+}
+index.htmlsignin-ok.htmlsignin-failed.htmlBootstraphttp://getbootstrap.com/view-koa/
+|
++- static/
+   |
+   +- css/ <- 存放bootstrap.css等
+   |
+   +- fonts/ <- 存放字体文件
+   |
+   +- js/ <- 存放bootstrap.js等
+这样我们在编写HTML的时候，可以直接用Bootstrap的CSS，像这样：<link rel="stylesheet" href="/static/css/bootstrap.css">
+现在，在使用MVC之前，第一个问题来了，如何处理静态文件？const path = require('path');
+const mime = require('mime');
+const fs = require('mz/fs');
+
+// url: 类似 '/static/'
+// dir: 类似 __dirname + '/static'
+function staticFiles(url, dir) {
+    return async (ctx, next) => {
+        let rpath = ctx.request.path;
+        // 判断是否以指定的url开头:
+        if (rpath.startsWith(url)) {
+            // 获取文件完整路径:
+            let fp = path.join(dir, rpath.substring(url.length));
+            // 判断文件是否存在:
+            if (await fs.exists(fp)) {
+                // 查找文件的mime:
+                ctx.response.type = mime.lookup(rpath);
+                // 读取文件内容并赋值给response.body:
+                ctx.response.body = await fs.readFile(fp);
+            } else {
+                // 文件不存在:
+                ctx.response.status = 404;
+            }
+        } else {
+            // 不是指定前缀的URL，继续处理下一个middleware:
+            await next();
+        }
+    };
+}
+
+module.exports = staticFiles;
+所有的第三方包都可以通过npm官网搜索并查看其文档：https://www.npmjs.com/https://www.npmjs.com/https://www.npmjs.com/let staticFiles = require('./static-files');
+app.use(staticFiles('/static/', __dirname + '/static'));
+const nunjucks = require('nunjucks');
+
+function createEnv(path, opts) {
+    var
+        autoescape = opts.autoescape && true,
+        noCache = opts.noCache || false,
+        watch = opts.watch || false,
+        throwOnUndefined = opts.throwOnUndefined || false,
+        env = new nunjucks.Environment(
+            new nunjucks.FileSystemLoader('views', {
+                noCache: noCache,
+                watch: watch,
+            }), {
+                autoescape: autoescape,
+                throwOnUndefined: throwOnUndefined
+            });
+    if (opts.filters) {
+        for (var f in opts.filters) {
+            env.addFilter(f, opts.filters[f]);
+        }
+    }
+    return env;
+}
+
+function templating(path, opts) {
+    // 创建Nunjucks的env对象:
+    var env = createEnv(path, opts);
+    return async (ctx, next) => {
+        // 给ctx绑定render函数:
+        ctx.render = function (view, model) {
+            // 把render后的内容赋值给response.body:
+            ctx.response.body = env.render(view, Object.assign({}, ctx.state || {}, model || {}));
+            // 设置Content-Type:
+            ctx.response.type = 'text/html';
+        };
+        // 继续处理请求:
+        await next();
+    };
+}
+
+module.exports = templating;
+const isProduction = process.env.NODE_ENV === 'production';
+
+app.use(templating('view', {
+    noCache: !isProduction,
+    watch: !isProduction
+}));
+类似的，我们在使用上面编写的处理静态文件的middleware时，也可以根据环境变量判断：if (! isProduction) {
+    let staticFiles = require('./static-files');
+    app.use(staticFiles('/static/', __dirname + '/static'));
+}
+这是因为在生产环境下，静态文件是由部署在最前面的反向代理服务器（如Nginx）处理的，Node程序不需要处理静态文件。而在开发环境下，我们希望koa能顺带处理静态文件，否则，就必须手动配置一个反向代理服务器，这样会导致开发环境非常复杂。第一个middleware是记录URL以及页面执行时间：app.use(async (ctx, next) => {
+    console.log(`Process ${ctx.request.method} ${ctx.request.url}...`);
+    var
+        start = new Date().getTime(),
+        execTime;
+    await next();
+    execTime = new Date().getTime() - start;
+    ctx.response.set('X-Response-Time', `${execTime}ms`);
+});
+第二个middleware处理静态文件：if (! isProduction) {
+    let staticFiles = require('./static-files');
+    app.use(staticFiles('/static/', __dirname + '/static'));
+}
+第三个middleware解析POST请求：app.use(bodyParser());
+app.use(templating('view', {
+    noCache: !isProduction,
+    watch: !isProduction
+}));
+最后一个middleware处理URL路由：addControllers(router);
+
+app.use(router.routes());
+直接在首页登录，如果输入正确的Email和Password，进入登录成功的页面：如果输入的Email和Password不正确，进入登录失败的页面：if (email === 'admin@example.com' && password === '123456') {
+    ...
+}
+当然，真实的网站会根据用户输入的Email和Password去数据库查询并判断登录是否成功，不过这需要涉及到Node.js环境如何操作数据库，我们后面再讨论。Object.assign({}, ctx.state || {}, model || {})
+这个小技巧是为了扩展。app.use(async (ctx, next) => {
+    var user = tryGetUserFromCookie(ctx.request);
+    if (user) {
+        ctx.state.user = user;
+        await next();
+    } else {
+        ctx.response.status = 403;
+    }
+});
+这样就没有必要在每个Controller的async函数中都把user变量放入model中。view-koaview-koahttps://github.com/michaelliao/learn-javascript/tree/master/samples/node/web/koa/view-koa

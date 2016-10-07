@@ -4,15 +4,16 @@ from collections import OrderedDict
 import re
 import os
 
-BASE_URL = r"http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000"
-START_ID = "0014316089557264a6b348958f449949df42a6d3a2e542c000"
+BASE_URL = r"http://www.liaoxuefeng.com/wiki/001434446689867b27157e896e74d51a89c25cc8b43bdb3000"
+START_ID = "001434446689867b27157e896e74d51a89c25cc8b43bdb3000"
 
-dir = "./data"  #储存爬虫下来的数据的目录，按网站的目录进行分类保存
+dir = "./jsdata"  #储存爬虫下来的数据的目录，按网站的目录进行分类保存
 
 #保存某个分支目录下的信息
 def saveContent(contInfo,filename):
     if not os.path.exists(dir):
         os.makedirs(dir)
+
     with open(dir+"/"+filename,"w") as f:
         for coni in contInfo:
             for texts in coni.find_all(re.compile(r"p|a|ul|li")):
@@ -20,6 +21,7 @@ def saveContent(contInfo,filename):
                     f.write(texts.string)
                     if texts.name == "a":
                         f.write(texts["href"])
+
 
 #爬虫获取详细信息
 def get_wiki_data(wikiid, name):
@@ -29,7 +31,7 @@ def get_wiki_data(wikiid, name):
     else:
        wikiurl = BASE_URL + r"/" + k
     try:
-        print(wikiurl)
+       # print(wikiurl)
 
         wikipage = request.Request(wikiurl)
         request.urlcleanup()
@@ -39,9 +41,13 @@ def get_wiki_data(wikiid, name):
 
     wikiSoup = BeautifulSoup(wikipagecontent)
     contentInfo = wikiSoup.find_all("div",{"class":"x-wiki-content"})
+    name = re.compile(r"\\|#|@|&|/|\?|\*").sub("",name)
     savefile = name + ".txt"
-    saveContent(contentInfo,savefile)
-
+    print(savefile)
+    try:
+        saveContent(contentInfo,savefile)
+    except Exception as e:
+        print(e)
 
 
 if __name__ == "__main__":

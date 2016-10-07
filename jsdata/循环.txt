@@ -1,0 +1,73 @@
+要计算1+2+3，我们可以直接写表达式：1 + 2 + 3; // 6
+要计算1+2+3+...+10，勉强也能写出来。但是，要计算1+2+3+...+10000，直接写表达式就不可能了。为了让计算机能计算成千上万次的重复运算，我们就需要循环语句。var x = 0;
+var i;
+for (i=1; i<=10000; i++) {
+    x = x + i;
+}
+x; // 50005000
+i=1 这是初始条件，将变量i置为1；i<=10000 这是判断条件，满足时就继续循环，不满足就退出循环；
+'use strict';
+----
+var x = ?;
+var i;
+for ...
+----
+if (x === 3628800) {
+    alert('1 x 2 x 3 x ... x 10 = ' + x);
+}
+else {
+    alert('计算错误');
+}
+var arr = ['Apple', 'Google', 'Microsoft'];
+var i, x;
+for (i=0; i<arr.length; i++) {
+    x = arr[i];
+    alert(x);
+}
+var x = 0;
+for (;;) { // 将无限循环下去
+    if (x > 100) {
+        break; // 通过if判断来退出循环
+    }
+    x ++;
+}
+var o = {
+    name: 'Jack',
+    age: 20,
+    city: 'Beijing'
+};
+for (var key in o) {
+    alert(key); // 'name', 'age', 'city'
+}
+var o = {
+    name: 'Jack',
+    age: 20,
+    city: 'Beijing'
+};
+for (var key in o) {
+    if (o.hasOwnProperty(key)) {
+        alert(key); // 'name', 'age', 'city'
+    }
+}
+var a = ['A', 'B', 'C'];
+for (var i in a) {
+    alert(i); // '0', '1', '2'
+    alert(a[i]); // 'A', 'B', 'C'
+}
+var x = 0;
+var n = 99;
+while (n > 0) {
+    x = x + n;
+    n = n - 2;
+}
+x; // 2500
+var n = 0;
+do {
+    n = n + 1;
+} while (n < 100);
+n; // 100
+
+'use strict';
+var arr = ['Bart', 'Lisa', 'Adam'];
+----
+循环是让计算机做重复任务的有效的方法，有些时候，如果代码写得有问题，会让程序陷入“死循环”，也就是永远循环下去。JavaScript的死循环会让浏览器无法正常显示或执行当前页面的逻辑，有的浏览器会直接挂掉，有的浏览器会在一段时间后提示你强行终止JavaScript的执行，因此，要特别注意死循环的问题。

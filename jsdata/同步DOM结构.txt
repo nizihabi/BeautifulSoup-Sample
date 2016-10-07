@@ -1,0 +1,52 @@
+除了简单的单向绑定和双向绑定，MVVM还有一个重要的用途，就是让Model和DOM的结构保持同步。<ol>
+    <li>
+        <dl>
+            <dt>产品评审</dt>
+            <dd>新款iPhone上市前评审</dd>
+        </dl>
+    </li>
+    <li>
+        <dl>
+            <dt>开发计划</dt>
+            <dd>与PM确定下一版Android开发计划</dd>
+        </dl>
+    </li>
+    <li>
+        <dl>
+            <dt>VC会议</dt>
+            <dd>敲定C轮5000万美元融资</dd>
+        </dl>
+    </li>
+</ol>
+而对应的Model可以用JavaScript数组表示：todos: [
+    {
+        name: '产品评审',
+        description: '新款iPhone上市前评审'
+    },
+    {
+        name: '开发计划',
+        description: '与PM确定下一版Android开发计划'
+    },
+    {
+        name: 'VC会议',
+        description: '敲定C轮5000万美元融资'
+    }
+]
+<ol>
+    <li v-for="t in todos">
+        <dl>
+            <dt>{{ t.name }}</dt>
+            <dd>{{ t.description }}</dd>
+        </dl>
+    </li>
+</ol>
+Proxyhttps://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ProxyObject.observe()https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observevm.todos[0] = {
+    name: 'New name',
+    description: 'New description'
+};
+会导致Vue无法更新View。正确的方法是不要对数组元素赋值，而是更新：vm.todos[0].name = 'New name';
+vm.todos[0].description = 'New description';
+var index = 0;
+var newElement = {...};
+vm.todos.splice(index, 1, newElement);
+用CSS修饰后的页面效果如下：vue-todovue-todohttps://github.com/michaelliao/learn-javascript/tree/master/samples/node/web/vue/vue-todo

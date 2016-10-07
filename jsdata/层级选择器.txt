@@ -1,0 +1,52 @@
+除了基本的选择器外，jQuery的层级选择器更加灵活，也更强大。因为DOM的结构就是层级结构，所以我们经常要根据层级关系进行选择。<!-- HTML结构 -->
+<div class="testing">
+    <ul class="lang">
+        <li class="lang-javascript">JavaScript</li>
+        <li class="lang-python">Python</li>
+        <li class="lang-lua">Lua</li>
+    </ul>
+</div>
+要选出JavaScript，可以用层级选择器：$('ul.lang li.lang-javascript'); // [<li class="lang-javascript">JavaScript</li>]
+$('div.testing li.lang-javascript'); // [<li class="lang-javascript">JavaScript</li>]
+$('ul.lang li');
+这种层级选择器相比单个的选择器好处在于，它缩小了选择范围，因为首先要定位父节点，才能选择相应的子节点，这样避免了页面其他不相关的元素。例如：$('form[name=upload] input');
+多层选择也是允许的：$('form.test p input'); // 在form表单选择被<p>包含的<input>
+$('ul.lang>li.lang-javascript'); // 可以选出[<li class="lang-javascript">JavaScript</li>]
+$('div.testing>li.lang-javascript'); // [], 无法选出，因为<div>和<li>不构成父子关系
+过滤器一般不单独使用，它通常附加在选择器上，帮助我们更精确地定位元素。观察过滤器的效果：$('ul.lang li'); // 选出JavaScript、Python和Lua 3个节点
+
+$('ul.lang li:first-child'); // 仅选出JavaScript
+$('ul.lang li:last-child'); // 仅选出Lua
+$('ul.lang li:nth-child(2)'); // 选出第N个元素，N从1开始
+$('ul.lang li:nth-child(even)'); // 选出序号为偶数的元素
+$('ul.lang li:nth-child(odd)'); // 选出序号为奇数的元素
+针对表单元素，jQuery还有一组特殊的选择器：此外，jQuery还有很多有用的选择器，例如，选出可见的或隐藏的元素：$('div:visible'); // 所有可见的div
+$('div:hidden'); // 所有隐藏的div
+针对如下HTML结构：<!-- HTML结构 -->
+
+<div class="test-selector">
+    <ul class="test-lang">
+        <li class="lang-javascript">JavaScript</li>
+        <li class="lang-python">Python</li>
+        <li class="lang-lua">Lua</li>
+    </ul>
+    <ol class="test-lang">
+        <li class="lang-swift">Swift</li>
+        <li class="lang-java">Java</li>
+        <li class="lang-c">C</li>
+    </ol>
+</div>
+选出相应的内容并观察效果：
+'use strict';
+var selected = null;
+----
+// 分别选择所有语言，所有动态语言，所有静态语言，JavaScript，Lua，C等:
+selected = ???
+----
+// 高亮结果:
+if (!(selected instanceof jQuery)) {
+    return alert('不是有效的jQuery对象!');
+}
+$('#test-jquery').find('*').css('background-color', '');
+selected.css('background-color', '#ffd351');
+JavaScriptPythonLuaSwiftJavaC

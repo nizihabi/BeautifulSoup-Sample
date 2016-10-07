@@ -1,0 +1,101 @@
+MapReduce: Simplified Data Processing on Large Clustershttp://research.google.com/archive/mapreduce.html2function pow(x) {
+    return x * x;
+}
+
+var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+arr.map(pow); // [1, 4, 9, 16, 25, 36, 49, 64, 81]
+var f = function (x) {
+    return x * x;
+};
+
+var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+var result = [];
+for (var i=0; i<arr.length; i++) {
+    result.push(f(arr[i]));
+}
+的确可以，但是，从上面的循环代码，我们无法一眼看明白“把f(x)作用在Array的每一个元素并把结果生成一个新的Array”。2var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+arr.map(String); // ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+只需要一行代码。[x1, x2, x3, x4].reduce(f) = f(f(f(x1, x2), x3), x4)
+var arr = [1, 3, 5, 7, 9];
+arr.reduce(function (x, y) {
+    return x + y;
+}); // 25
+
+'use strict';
+
+function product(arr) {
+----
+    return 0;
+----
+}
+
+// 测试:
+if (product([1, 2, 3, 4]) === 24 && product([0, 1, 2]) === 0 && product([99, 88, 77, 66]) === 44274384) {
+    alert('测试通过!');
+}
+else {
+    alert('测试失败!');
+}
+var arr = [1, 3, 5, 7, 9];
+arr.reduce(function (x, y) {
+    return x * 10 + y;
+}); // 13579
+
+'use strict';
+
+function string2int(s) {
+----
+    return 0;
+----
+}
+
+// 测试:
+if (string2int('0') === 0 && string2int('12345') === 12345 && string2int('12300') === 12300) {
+    if (string2int.toString().indexOf('parseInt') !== -1) {
+        alert('请勿使用parseInt()!');
+    } else if (string2int.toString().indexOf('Number') !== -1) {
+        alert('请勿使用Number()!');
+    } else {
+        alert('测试通过!');
+    }
+}
+else {
+    alert('测试失败!');
+}
+
+'use strict';
+
+function normalize(arr) {
+----
+    return [];
+----
+}
+
+// 测试:
+if (normalize(['adam', 'LISA', 'barT']).toString() === ['Adam', 'Lisa', 'Bart'].toString()) {
+    alert('测试通过!');
+}
+else {
+    alert('测试失败!');
+}
+
+'use strict';
+
+var arr = ['1', '2', '3'];
+var r;
+----
+r = arr.map(parseInt);
+----
+alert('[' + r[0] + ', ' + r[1] + ', ' + r[2] + ']');
+Array.prototype.map()的文档https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map原因分析parseInt('0', 0); // 0, 按十进制转换parseInt('0', 0); // 0, 按十进制转换parseInt('1', 1); // NaN, 没有一进制parseInt('1', 1); // NaN, 没有一进制parseInt('2', 2); // NaN, 按二进制转换不允许出现2parseInt('2', 2); // NaN, 按二进制转换不允许出现2
+$(function () {
+    $('#x-why-parseInt-failed').click(function () {
+        var btn = $(this);
+        btn.attr('disabled', 'disabled');
+        btn.text('请先思考60秒...');
+        setTimeout(function () {
+            $('#x-why-parseInt-failed').hide();
+            $('#x-answer-parseInt-failed').show();
+        }, 60000);
+    });
+});

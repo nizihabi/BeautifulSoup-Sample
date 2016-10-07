@@ -1,0 +1,21 @@
+你可能听说过jQuery，它名字起得很土，但却是JavaScript世界中使用最广泛的一个库。江湖传言，全世界大约有80~90%的网站直接或间接地使用了jQuery。鉴于它如此流行，又如此好用，所以每一个入门JavaScript的前端工程师都应该了解和学习它。jQuery这么流行，肯定是因为它解决了一些很重要的问题。实际上，jQuery能帮我们干这些事情：消除浏览器差异：你不需要自己写冗长的代码来针对不同的浏览器来绑定事件，编写AJAX等代码；轻松实现动画、修改CSS等各种操作。jQuery的理念“Write Less, Do More“，让你写更少的代码，完成更多的工作！目前jQuery有1.x和2.x两个主要版本，区别在于2.x移除了对古老的IE 6、7、8的支持，因此2.x的代码更精简。选择哪个版本主要取决于你是否想支持IE 6~8。jQuery官网http://jquery.com/download/<html>
+<head>
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    ...
+</head>
+<body>
+    ...
+</body>
+</html>
+好消息是，当你在学习这个教程时，由于网站本身已经引用了jQuery，所以你可以直接使用：
+'use strict';
+----
+alert('jQuery版本：' + $.fn.jquery);
+window.jQuery; // jQuery(selector, context)
+window.$; // jQuery(selector, context)
+$ === jQuery; // true
+typeof($); // 'function'
+$; // jQuery(selector, context)
+jQuery.noConflict();
+$; // undefined
+jQuery; // jQuery(selector, context)

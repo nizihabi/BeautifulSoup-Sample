@@ -1,0 +1,93 @@
+MVVM就是在前端页面上，应用了扩展的MVC模式，我们关心Model的变化，MVVM框架自动把Model的变化映射到DOM结构上，这样，用户看到的页面内容就会随着Model的变化而更新。例如，我们定义好一个JavaScript对象作为Model，并且把这个Model的两个属性绑定到DOM节点上：经过MVVM框架的自动转换，浏览器就可以直接显示Model的数据了：现在问题来了：MVVM框架哪家强？目前，常用的MVVM框架有：Angularhttps://angularjs.org/Backbone.jshttp://backbonejs.org/Emberhttp://emberjs.com/我们选择MVVM的目标应该是入门容易，安装简单，能直接在页面写JavaScript，需要更复杂的功能时又能扩展支持。尤雨溪http://weibo.com/p/1005051761511274Vue.jshttp://vuejs.org/目前，Vue.js的最新版本是2.0，我们会使用2.0版本作为示例。我们首先创建基于koa的Node.js项目。虽然目前我们只需要在HTML静态页面中编写MVVM，但是很快我们就需要和后端API进行交互，因此，要创建基于koa的项目结构如下：hello-vue/
+|
++- .vscode/
+|  |
+|  +- launch.json <-- VSCode 配置文件
+|
++- app.js <-- koa app
+|
++- start.js <-- 入口js
+|
++- static-files.js <-- 支持静态文件的koa middleware
+|
++- package.json <-- 项目描述文件
+|
++- node_modules/ <-- npm安装的所有依赖包
+|
++- static/ <-- 存放静态资源文件
+   |
+   +- css/ <-- 存放bootstrap.css等
+   |
+   +- fonts/ <-- 存放字体文件
+   |
+   +- js/ <-- 存放各种js文件
+   |
+   +- index.html <-- 使用MVVM的静态页面
+"dependencies": {
+    "babel-core": "6.13.2",
+    "babel-polyfill": "6.13.0",
+    "babel-preset-es2015-node6": "0.3.0",
+    "babel-preset-stage-3": "6.5.0",
+    "koa": "2.0.0",
+    "mime": "1.3.4",
+    "mz": "2.4.0"
+}
+安装Vue有很多方法，可以用npm或者webpack。但是我们现在的目标是尽快用起来，所以最简单的方法是直接在HTML代码中像引用jQuery一样引用Vue。可以直接使用CDN的地址，例如：<script src="https://unpkg.com/vue@2.0.1/dist/vue.js"></script>
+<script src="/static/js/vue.js"></script>
+下一步，我们就可以在HTML页面中编写JavaScript代码了。我们的Model是一个JavaScript对象，它包含两个属性：{
+    name: 'Robot',
+    age: 15
+}
+<div id="vm">
+    <p>Hello, {{ name }}!</p>
+    <p>You are {{ age }} years old!</p>
+</div>
+<html>
+<head>
+
+<!-- 引用jQuery -->
+<script src="/static/js/jquery.min.js"></script>
+
+<!-- 引用Vue -->
+<script src="/static/js/vue.js"></script>
+
+<script>
+// 初始化代码:
+$(function () {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            name: 'Robot',
+            age: 15
+        }
+    });
+    window.vm = vm;
+});
+</script>
+
+</head>
+
+<body>
+
+    <div id="vm">
+        <p>Hello, {{ name }}!</p>
+        <p>You are {{ age }} years old!</p>
+    </div>
+
+</body>
+<html>
+我们创建一个VM的核心代码如下：var vm = new Vue({
+    el: '#vm',
+    data: {
+        name: 'Robot',
+        age: 15
+    }
+});
+<div id="vm">
+    ...
+</div>
+Hello, Robot!
+You are 15 years old!
+window.vm.name = 'Bob'
+经过CSS修饰后的页面如下：可以在页面直接输入JavaScript代码改变Model，并观察页面变化。<p>Hello, <span v-text="name"></span>!</p>
+hello-vuehello-vuehttps://github.com/michaelliao/learn-javascript/tree/master/samples/node/web/vue/hello-vue

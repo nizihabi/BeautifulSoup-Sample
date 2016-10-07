@@ -1,0 +1,50 @@
+拿到一个DOM节点后，我们可以对它进行更新。可以直接修改节点的文本，方法有两种：// 获取<p id="p-id">...</p>
+var p = document.getElementById('p-id');
+// 设置文本为abc:
+p.innerHTML = 'ABC'; // <p id="p-id">ABC</p>
+// 设置HTML:
+p.innerHTML = 'ABC <span style="color:red">RED</span> XYZ';
+// <p>...</p>的内部结构已修改
+// 获取<p id="p-id">...</p>
+var p = document.getElementById('p-id');
+// 设置文本:
+p.innerText = '<script>alert("Hi")</script>';
+// HTML被自动编码，无法设置一个<script>节点:
+// <p id="p-id">&lt;script&gt;alert("Hi")&lt;/script&gt;</p>
+// 获取<p id="p-id">...</p>
+var p = document.getElementById('p-id');
+// 设置CSS:
+p.style.color = '#ff0000';
+p.style.fontSize = '20px';
+p.style.paddingTop = '2em';
+有如下的HTML结构：javascriptJava<!-- HTML结构 -->
+<div id="test-div">
+  <p id="test-js">javascript</p>
+  <p>Java</p>
+</div>
+请尝试获取指定节点并修改：
+'use strict';
+----
+// 获取<p>javascript</p>节点:
+var js = ???;
+
+// 修改文本为JavaScript:
+// TODO:
+
+// 修改CSS为: color: #ff0000, font-weight: bold
+// TODO:
+----
+// 测试:
+if (js && js.parentNode && js.parentNode.id === 'test-div' && js.id === 'test-js') {
+    if (js.innerText === 'JavaScript') {
+        if (js.style && js.style.fontWeight === 'bold' && (js.style.color === 'red' || js.style.color === '#ff0000' || js.style.color === '#f00' || js.style.color === 'rgb(255, 0, 0)')) {
+            alert('测试通过!');
+        } else {
+            alert('CSS样式测试失败!');
+        }
+    } else {
+        alert('文本测试失败!');
+    }
+} else {
+    alert('节点测试失败!');
+}

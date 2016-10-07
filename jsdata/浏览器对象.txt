@@ -1,0 +1,75 @@
+JavaScript可以获取浏览器提供的很多对象，并进行操作。兼容性：IE<=8不支持。
+'use strict';
+----
+// 可以调整浏览器窗口大小试试:
+alert('window inner size: ' + window.innerWidth + ' x ' + window.innerHeight);
+navigator.appName：浏览器名称；navigator.appVersion：浏览器版本；navigator.language：浏览器设置的语言；navigator.platform：操作系统类型；
+'use strict';
+----
+alert('appName = ' + navigator.appName + '\n' +
+      'appVersion = ' + navigator.appVersion + '\n' +
+      'language = ' + navigator.language + '\n' +
+      'platform = ' + navigator.platform + '\n' +
+      'userAgent = ' + navigator.userAgent);
+var width;
+if (getIEVersion(navigator.userAgent) < 9) {
+    width = document.body.clientWidth;
+} else {
+    width = window.innerWidth;
+}
+var width = window.innerWidth || document.body.clientWidth;
+screen.width：屏幕宽度，以像素为单位；screen.height：屏幕高度，以像素为单位；screen.colorDepth：返回颜色位数，如8、16、24。
+'use strict';
+----
+alert('Screen size = ' + screen.width + ' x ' + screen.height);
+http://www.example.com:8080/path/index.html?a=1&b=2#TOP
+location.protocol; // 'http'
+location.host; // 'www.example.com'
+location.port; // '8080'
+location.pathname; // '/path/index.html'
+location.search; // '?a=1&b=2'
+location.hash; // 'TOP'
+
+'use strict';
+----
+if (confirm('重新加载当前页' + location.href + '?')) {
+    location.reload();
+} else {
+    location.assign('/discuss'); // 设置一个新的URL地址
+}
+
+'use strict';
+----
+document.title = '努力学习JavaScript!';
+请观察浏览器窗口标题的变化。我们先准备HTML数据：<dl id="drink-menu" style="border:solid 1px #ccc;padding:6px;">
+    <dt>摩卡</dt>
+    <dd>热摩卡咖啡</dd>
+    <dt>酸奶</dt>
+    <dd>北京老酸奶</dd>
+    <dt>果汁</dt>
+    <dd>鲜榨苹果汁</dd>
+</dl>
+
+'use strict';
+----
+var menu = document.getElementById('drink-menu');
+var drinks = document.getElementsByTagName('dt');
+var i, s, menu, drinks;
+
+menu = document.getElementById('drink-menu');
+menu.tagName; // 'DL'
+
+drinks = document.getElementsByTagName('dt');
+s = '提供的饮料有:';
+for (i=0; i<drinks.length; i++) {
+    s = s + drinks[i].innerHTML + ',';
+}
+alert(s);
+Cookie还可以存储网站的一些设置，例如，页面显示的语言等等。document.cookie; // 'v=123; remember=true; prefer=zh'
+由于JavaScript能读取到页面的Cookie，而用户的登录信息通常也存在Cookie中，这就造成了巨大的安全隐患，这是因为在HTML页面中引入第三方的JavaScript代码是允许的：<!-- 当前页面在wwwexample.com -->
+<html>
+    <head>
+        <script src="http://www.foo.com/jquery.js"></script>
+    </head>
+    ...
+</html>

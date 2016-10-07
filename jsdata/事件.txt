@@ -1,0 +1,188 @@
+因为JavaScript在浏览器中以单线程模式运行，页面加载后，一旦页面上所有的JavaScript代码被执行完后，就只能依赖触发事件来执行JavaScript代码。浏览器在接收到用户的鼠标或键盘输入后，会自动在对应的DOM节点上触发相应的事件。如果该节点已经绑定了对应的JavaScript处理函数，该函数就会自动调用。由于不同的浏览器绑定事件的代码都不太一样，所以用jQuery来写代码，就屏蔽了不同浏览器的差异，我们总是编写相同的代码。
+$(function () {
+    $('#test-link').click(function () {
+        alert('Hello!');
+    });
+});
+/* HTML:
+ *
+ * <a id="test-link" href="#0">点我试试</a>
+ *
+ */
+
+// 获取超链接的jQuery对象:
+var a = $('#test-link');
+a.on('click', function () {
+    alert('Hello!');
+});
+点我试试#0a.click(function () {
+    alert('Hello!');
+});
+两者完全等价。我们通常用后面的写法。jQuery能够绑定的事件主要包括：click: 鼠标单击时触发；
+dblclick：鼠标双击时触发；
+mouseenter：鼠标进入时触发；
+mouseleave：鼠标移出时触发；
+mousemove：鼠标在DOM内部移动时触发；
+hover：鼠标进入和退出时触发两个函数，相当于mouseenter加上mouseleave。keydown：键盘按下时触发；
+keyup：键盘松开时触发；
+keypress：按一次键后触发。<html>
+<head>
+    <script>
+        // 代码有误:
+        $('#testForm).on('submit', function () {
+            alert('submit!');
+        });
+    </script>
+</head>
+<body>
+    <form id="testForm">
+        ...
+    </form>
+</body>
+<html>
+<head>
+    <script>
+        $(document).on('ready', function () {
+            $('#testForm).on('submit', function () {
+                alert('submit!');
+            });
+        });
+    </script>
+</head>
+<body>
+    <form id="testForm">
+        ...
+    </form>
+</body>
+这样写就没有问题了。因为相关代码会在DOM树初始化后再执行。$(document).ready(function () {
+    // on('submit', function)也可以简化:
+    $('#testForm).submit(function () {
+        alert('submit!');
+    });
+});
+甚至还可以再简化为：$(function () {
+    // init...
+});
+完全可以反复绑定事件处理函数，它们会依次执行：$(function () {
+    console.log('init A...');
+});
+$(function () {
+    console.log('init B...');
+});
+$(function () {
+    console.log('init C...');
+});
+$(function () {
+    $('#testMouseMoveDiv').mousemove(function (e) {
+        $('#testMouseMoveSpan').text('pageX = ' + e.pageX + ', pageY = ' + e.pageY);
+    });
+});
+
+$(function () {
+    $('#testMouseMoveDiv').mousemove(function (e) {
+        $('#testMouseMoveSpan').text('pageX = ' + e.pageX + ', pageY = ' + e.pageY);
+    });
+});
+效果实测：function hello() {
+    alert('hello!');
+}
+
+a.click(hello); // 绑定事件
+
+// 10秒钟后解除绑定:
+setTimeout(function () {
+    a.off('click', hello);
+}, 10000);
+需要特别注意的是，下面这种写法是无效的：// 绑定事件:
+a.click(function () {
+    alert('hello!');
+});
+
+// 解除绑定:
+a.off('click', function () {
+    alert('hello!');
+});
+一个需要注意的问题是，事件的触发总是由用户操作引发的。例如，我们监控文本框的内容改动：var input = $('#test-input');
+input.change(function () {
+    console.log('changed...');
+});
+var input = $('#test-input');
+input.val('change it!'); // 无法触发change事件
+var input = $('#test-input');
+input.val('change it!');
+input.change(); // 触发change事件
+为什么我们希望手动触发一个事件呢？如果不这么做，很多时候，我们就得写两份一模一样的代码。// 无法弹出新窗口，将被浏览器屏蔽:
+$(function () {
+    window.open('/');
+});
+这些“敏感代码”只能由用户操作来触发：var button1 = $('#testPopupButton1');
+var button2 = $('#testPopupButton2');
+
+function popupTestWindow() {
+    window.open('/');
+}
+
+button1.click(function () {
+    popupTestWindow();
+});
+
+button2.click(function () {
+    // 不立刻执行popupTestWindow()，100毫秒后执行:
+    setTimeout(popupTestWindow, 100);
+});
+
+$(function () {
+    var button1 = $('#testPopupButton1');
+    var button2 = $('#testPopupButton2');
+
+    function popupTestWindow() {
+        window.open('?t=' + new Date().getTime(), 'popupWindow', 'width=400&height=300');
+    }
+
+    button1.click(function () {
+        popupTestWindow();
+    });
+
+    button2.click(function () {
+        setTimeout(popupTestWindow, 100);
+    });
+});
+效果实测：对如下的Form表单：<!-- HTML结构 -->
+<form id="test-form" action="test">
+    <legend>请选择想要学习的编程语言：</legend>
+    <fieldset>
+        <p><label class="selectAll"><input type="checkbox"> <span class="selectAll">全选</span><span class="deselectAll">全不选</span></label> <a href="#0" class="invertSelect">反选</a></p>
+        <p><label><input type="checkbox" name="lang" value="javascript"> JavaScript</label></p>
+        <p><label><input type="checkbox" name="lang" value="python"> Python</label></p>
+        <p><label><input type="checkbox" name="lang" value="ruby"> Ruby</label></p>
+        <p><label><input type="checkbox" name="lang" value="haskell"> Haskell</label></p>
+        <p><label><input type="checkbox" name="lang" value="scheme"> Scheme</label></p>
+        <p><button type="submit">Submit</button></p>
+    </fieldset>
+</form>
+绑定合适的事件处理函数，实现以下逻辑：当用户勾上“全选”时，自动选中所有语言，并把“全选”变成“全不选”；当用户去掉“全不选”时，自动不选中所有语言；当用户点击“反选”时，自动把所有语言状态反转（选中的变为未选，未选的变为选中）；当用户把所有语言都手动勾上时，“全选”被自动勾上，并变为“全不选”；当用户手动去掉选中至少一种语言时，“全不选”自动被去掉选中，并变为“全选”。
+'use strict';
+
+var
+    form = $('#test-form'),
+    langs = form.find('[name=lang]'),
+    selectAll = form.find('label.selectAll :checkbox'),
+    selectAllLabel = form.find('label.selectAll span.selectAll'),
+    deselectAllLabel = form.find('label.selectAll span.deselectAll'),
+    invertSelect = form.find('a.invertSelect');
+
+// 重置初始化状态:
+form.find('*').show().off();
+form.find(':checkbox').prop('checked', false).off();
+deselectAllLabel.hide();
+// 拦截form提交事件:
+form.off().submit(function (e) {
+    e.preventDefault();
+    alert(form.serialize());
+});
+----
+// TODO:绑定事件
+----
+// 测试:
+alert('请测试功能是否正常。');
+全选全不选反选#0 JavaScript JavaScript JavaScript Python Python Python Ruby Ruby Ruby Haskell Haskell Haskell Scheme Scheme SchemeSubmit

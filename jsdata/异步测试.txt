@@ -1,0 +1,66 @@
+用mocha测试一个函数是非常简单的，但是，在JavaScript的世界中，更多的时候，我们编写的是异步代码，所以，我们需要用mocha测试异步函数。const fs = require('mz/fs');
+
+// a simple async function:
+module.exports = async () => {
+    let expression = await fs.readFile('./data.txt', 'utf-8');
+    let fn = new Function('return ' + expression);
+    let r = fn();
+    console.log(`Calculate: ${expression} = ${r}`);
+    return r;
+};
+1 + (2 + 4) * (9 - 2) / 3
+"dependencies": {
+    "babel-core": "6.13.2",
+    "babel-polyfill": "6.13.0",
+    "babel-preset-es2015-node6": "0.3.0",
+    "babel-preset-stage-3": "6.5.0",
+    "mz": "2.4.0"
+},
+我们先看看mocha如何实现异步测试。如果要测试同步函数，我们传入无参数函数即可：it('test sync function', function () {
+    // TODO:
+    assert(true);
+});
+it('test async function', function (done) {
+    fs.readFile('filepath', function (err, data) {
+        if (err) {
+            done(err);
+        } else {
+            done();
+        }
+    });
+});
+对于用ES7的async编写的函数，我们可以这么写：it('#async with done', (done) => {
+    (async function () {
+        try {
+            let r = await hello();
+            assert.strictEqual(r, 15);
+            done();
+        } catch (err) {
+            done(err);
+        }
+    })();
+});
+但是用try...catch太麻烦。还有一种更简单的写法，就是直接把async函数当成同步函数来测试：it('#async function', async () => {
+    let r = await hello();
+    assert.strictEqual(r, 15);
+});
+这么写异步测试，太简单了有木有！async-test/
+|
++- .vscode/
+|  |
+|  +- launch.json <-- VSCode 配置文件
+|
++- hello.js <-- 待测试js文件
+|
++- data.txt <-- 数据文件
+|
++- test/ <-- 存放所有test
+｜ ｜
+|  +- await-test.js <-- 异步测试
+|
++- package.json <-- 项目描述文件
+|
++- node_modules/ <-- npm安装的所有依赖包
+require('babel-core/register')({
+    presets: ['stage-3']
+});

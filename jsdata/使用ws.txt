@@ -1,0 +1,55 @@
+要使用WebSocket，关键在于服务器端支持，这样，我们才有可能用支持WebSocket的浏览器使用WebSocket。"dependencies": {
+    "ws": "1.1.1"
+}
+整个工程结构如下：hello-ws/
+|
++- .vscode/
+|  |
+|  +- launch.json <-- VSCode 配置文件
+|
++- app.js <-- 启动js文件
+|
++- package.json <-- 项目描述文件
+|
++- node_modules/ <-- npm安装的所有依赖包
+创建一个WebSocket的服务器实例非常容易：// 导入WebSocket模块:
+const WebSocket = require('ws');
+
+// 引用Server类:
+const WebSocketServer = WebSocket.Server;
+
+// 实例化:
+const wss = new WebSocketServer({
+    port: 3000
+});
+wss.on('connection', function (ws) {
+    console.log(`[SERVER] connection()`);
+    ws.on('message', function (message) {
+        console.log(`[SERVER] Received: ${message}`);
+        ws.send(`ECHO: ${message}`, (err) => {
+            if (err) {
+                console.log(`[SERVER] error: ${err}`);
+            }
+        });
+    })
+});
+现在，这个简单的服务器端WebSocket程序就编写好了。如何真正创建WebSocket并且给服务器发消息呢？方法是在浏览器中写JavaScript代码。// 打开一个WebSocket:
+var ws = new WebSocket('ws://localhost:3000/test');
+// 响应onmessage事件:
+ws.onmessage = function(msg) { console.log(msg); };
+// 给服务器发送一个字符串:
+ws.send('Hello!');
+一切正常的话，可以看到Console的输出如下：MessageEvent {isTrusted: true, data: "ECHO: Hello!", origin: "ws://localhost:3000", lastEventId: "", source: null…}
+这样，我们就在浏览器中成功地收到了服务器发送的消息！客户端的写法如下：let ws = new WebSocket('ws://localhost:3000/test');
+
+// 打开WebSocket连接后立刻发送一条消息:
+ws.on('open', function () {
+    console.log(`[CLIENT] open()`);
+    ws.send('Hello!');
+});
+
+// 响应收到的消息:
+ws.on('message', function (message) {
+    console.log(`[CLIENT] Received: ${message}`);
+}
+实际应用中还需要根据不同的路径实现不同的功能。hello-wshello-wshttps://github.com/michaelliao/learn-javascript/tree/master/samples/node/web/ws/hello-ws

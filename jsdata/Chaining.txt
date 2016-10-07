@@ -1,0 +1,11 @@
+还记得jQuery支持链式调用吗？$('a').attr('target', '_blank')
+      .append(' <i class="uk-icon-external-link"></i>')
+      .click(function () {});
+如果我们有一组操作，用underscore提供的函数，写出来像这样：_.filter(_.map([1, 4, 9, 16, 25], Math.sqrt), x => x % 2 === 1);
+// [1, 3, 5]
+能不能写成链式调用？能！_.chain([1, 4, 9, 16, 25])
+ .map(Math.sqrt)
+ .filter(x => x % 2 === 1)
+ .value();
+// [1, 3, 5]
+通过学习underscore，是不是对JavaScript的函数式编程又有了进一步的认识？

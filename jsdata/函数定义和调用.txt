@@ -1,0 +1,157 @@
+在JavaScript中，定义函数的方式如下：function abs(x) {
+    if (x >= 0) {
+        return x;
+    } else {
+        return -x;
+    }
+}
+因此，第二种定义函数的方式如下：var abs = function (x) {
+    if (x >= 0) {
+        return x;
+    } else {
+        return -x;
+    }
+};
+调用函数时，按顺序传入参数即可：abs(10); // 返回10
+abs(-9); // 返回9
+由于JavaScript允许传入任意个参数而不影响调用，因此传入的参数比定义的参数多也没有问题，虽然函数内部并不需要这些参数：abs(10, 'blablabla'); // 返回10
+abs(-9, 'haha', 'hehe', null); // 返回9
+传入的参数比定义的少也没有问题：abs(); // 返回NaN
+function abs(x) {
+    if (typeof x !== 'number') {
+        throw 'Not a number';
+    }
+    if (x >= 0) {
+        return x;
+    } else {
+        return -x;
+    }
+}
+function foo(x) {
+    alert(x); // 10
+    for (var i=0; i<arguments.length; i++) {
+        alert(arguments[i]); // 10, 20, 30
+    }
+}
+foo(10, 20, 30);
+function abs() {
+    if (arguments.length === 0) {
+        return 0;
+    }
+    var x = arguments[0];
+    return x >= 0 ? x : -x;
+}
+
+abs(); // 0
+abs(10); // 10
+abs(-9); // 9
+// foo(a[, b], c)
+// 接收2~3个参数，b是可选参数，如果只传2个参数，b默认为null：
+function foo(a, b, c) {
+    if (arguments.length === 2) {
+        // 实际拿到的参数是a和b，c为undefined
+        c = b; // 把b赋给c
+        b = null; // b变为默认值
+    }
+    // ...
+}
+function foo(a, b) {
+    var i, rest = [];
+    if (arguments.length > 2) {
+        for (i = 2; i<arguments.length; i++) {
+            rest.push(arguments[i]);
+        }
+    }
+    console.log('a = ' + a);
+    console.log('b = ' + b);
+    console.log(rest);
+}
+ES6标准引入了rest参数，上面的函数可以改写为：function foo(a, b, ...rest) {
+    console.log('a = ' + a);
+    console.log('b = ' + b);
+    console.log(rest);
+}
+
+foo(1, 2, 3, 4, 5);
+// 结果:
+// a = 1
+// b = 2
+// Array [ 3, 4, 5 ]
+
+foo(1);
+// 结果:
+// a = 1
+// b = undefined
+// Array []
+
+'use strict';
+----
+function sum(...rest) {
+   ???
+}
+----
+// 测试:
+var i, args = [];
+for (i=1; i<=100; i++) {
+    args.push(i);
+}
+if (sum() !== 0) {
+    alert('测试失败: sum() = ' + sum());
+} else if (sum(1) !== 1) {
+    alert('测试失败: sum(1) = ' + sum(1));
+} else if (sum(2, 3) !== 5) {
+    alert('测试失败: sum(2, 3) = ' + sum(2, 3));
+} else if (sum.apply(null, args) !== 5050) {
+    alert('测试失败: sum(1, 2, 3, ..., 100) = ' + sum.apply(null, args));
+} else {
+    alert('测试通过!');
+}
+前面我们讲到了JavaScript引擎有一个在行末自动添加分号的机制，这可能让你栽到return语句的一个大坑：function foo() {
+    return { name: 'foo' };
+}
+
+foo(); // { name: 'foo' }
+如果把return语句拆成两行：function foo() {
+    return
+        { name: 'foo' };
+}
+
+foo(); // undefined
+function foo() {
+    return; // 自动添加了分号，相当于return undefined;
+        { name: 'foo' }; // 这行语句已经没法执行到了
+}
+所以正确的多行写法是：function foo() {
+    return { // 这里不会自动加分号，因为{表示语句尚未结束
+        name: 'foo'
+    };
+}
+r: 表示圆的半径；pi: 表示π的值，如果不传，则默认3.14
+'use strict';
+
+function area_of_circle(r, pi) {
+----
+    return 0;
+----
+}
+// 测试:
+if (area_of_circle(2) === 12.56 && area_of_circle(2, 3.1416) === 12.5664) {
+    alert('测试通过');
+} else {
+    alert('测试失败');
+}
+
+'use strict';
+
+function max(a, b) {
+----
+    if (a > b) {
+        return
+                a;
+    } else {
+        return
+                b;
+    }
+----
+}
+alert(max(15, 20));

@@ -1,0 +1,86 @@
+编写REST API，实际上就是编写处理HTTP请求的async函数，不过，REST请求和普通的HTTP请求有几个特殊的地方：REST规范定义了资源的通用访问格式，虽然它不是一个强制要求，但遵守该规范可以让人易于理解。例如，商品Product就是一种资源。获取所有Product的URL如下：GET /api/products
+GET /api/products/123
+新建一个Product使用POST请求，JSON数据包含在body中，URL如下：POST /api/products
+PUT /api/products/123
+DELETE /api/products/123
+资源还可以按层次组织。例如，获取某个Product的所有评论，使用：GET /api/products/123/reviews
+当我们只需要获取部分数据时，可通过参数限制返回的结果集，例如，返回第2页评论，每页10项，按时间排序：GET /api/products/123/reviews?page=2&size=10&sort=time
+既然我们已经使用koa作为Web框架处理HTTP请求，因此，我们仍然可以在koa中响应并处理REST请求。rest-hello/
+|
++- .vscode/
+|  |
+|  +- launch.json <-- VSCode 配置文件
+|
++- controllers/
+|  |
+|  +- api.js <-- REST API
+|
++- app.js <-- 使用koa的js
+|
++- start.js <-- 启动入口js文件
+|
++- controller.js <-- 扫描注册Controller
+|
++- package.json <-- 项目描述文件
+|
++- node_modules/ <-- npm安装的所有依赖包
+"dependencies": {
+    "babel-core": "6.13.2",
+    "babel-polyfill": "6.13.0",
+    "babel-preset-es2015-node6": "0.3.0",
+    "babel-preset-stage-3": "6.5.0",
+    "koa": "2.0.0",
+    "koa-bodyparser": "3.2.0",
+    "koa-router": "7.0.0"
+}
+const app = new Koa();
+
+const controller = require('./controller');
+
+// parse request body:
+app.use(bodyParser());
+
+// add controller:
+app.use(controller());
+
+app.listen(3000);
+console.log('app started at port 3000...');
+// 存储Product列表，相当于模拟数据库:
+var products = [{
+    name: 'iPhone',
+    price: 6999
+}, {
+    name: 'Kindle',
+    price: 999
+}];
+
+module.exports = {
+    'GET /api/products': async (ctx, next) => {
+        // 设置Content-Type:
+        ctx.response.type = 'application/json';
+        // 设置Response Body:
+        ctx.response.body = {
+            products: products
+        };
+    }
+}
+{"products":[{"name":"iPhone","price":6999},{"name":"Kindle","price":999}]}
+紧接着，我们再添加一个创建Product的API：module.exports = {
+    'GET /api/products': async (ctx, next) => {
+        ...
+    },
+
+    'POST /api/products': async (ctx, next) => {
+        var p = {
+            name: ctx.request.body.name,
+            price: ctx.request.body.price
+        };
+        products.push(p);
+        ctx.response.type = 'application/json';
+        ctx.response.body = p;
+    }
+};
+curl -H 'Content-Type: application/json' -X POST -d '{"name":"XBox","price":3999}' http://localhost:3000/api/products
+得到的返回内容如下：{"name":"XBox","price":3999}
+{"products":[{"name":"iPhone","price":6999},{"name":"Kindle","price":999},{"name":"XBox","price":3999}]}
+rest-hellorest-hellohttps://github.com/michaelliao/learn-javascript/tree/master/samples/node/web/rest/rest-hello

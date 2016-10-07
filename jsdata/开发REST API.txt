@@ -1,0 +1,247 @@
+使用REST虽然非常简单，但是，设计一套合理的REST框架却需要仔细考虑很多问题。在实际工程中，一个Web应用既有REST，还有MVC，可能还需要集成其他第三方系统。如何组织URL？使用不同的子域名也可以区分，但对于中小项目来说配置麻烦。随着项目的扩大，将来仍然可以把单域名拆成多域名。如果每个异步函数都编写下面这样的代码：// 设置Content-Type:
+ctx.response.type = 'application/json';
+// 设置Response Body:
+ctx.response.body = {
+    products: products
+};
+module.exports = {
+    restify: (pathPrefix) => {
+        // REST API前缀，默认为/api/:
+        pathPrefix = pathPrefix || '/api/';
+        return async (ctx, next) => {
+            // 是否是REST API前缀?
+            if (ctx.request.path.startsWith(pathPrefix)) {
+                // 绑定rest()方法:
+                ctx.rest = (data) => {
+                    ctx.response.type = 'application/json';
+                    ctx.response.body = data;
+                }
+                await next();
+            } else {
+                await next();
+            }
+        };
+    }
+};
+这样，任何支持REST的异步函数只需要简单地调用：ctx.rest({
+    data: 123
+});
+就完成了REST请求的处理。这个问题实际上有两部分。第一，当REST API请求出错时，我们如何返回错误信息？第二，当客户端收到REST响应后，如何判断是成功还是错误？这两部分还必须统一考虑。REST架构本身对错误处理并没有统一的规定。实际应用时，各种各样的错误处理机制都有。有的设计得比较合理，有的设计得不合理，导致客户端尤其是手机客户端处理API简直就是噩梦。在涉及到REST API的错误时，我们必须先意识到，客户端会遇到两种类型的REST API错误。一类是类似403，404，500等错误，这些错误实际上是HTTP请求可能发生的错误。REST请求只是一种请求类型和响应类型均为JSON的HTTP请求，因此，这些错误在REST请求中也会发生。针对这种类型的错误，客户端除了提示用户“出现了网络错误，稍后重试”以外，并无法获得具体的错误信息。另一类错误是业务逻辑的错误，例如，输入了不合法的Email地址，试图删除一个不存在的Product，等等。这种类型的错误完全可以通过JSON返回给客户端，这样，客户端可以根据错误信息提示用户“Email不合法”等，以便用户修复后重新请求API。问题的关键在于客户端必须能区分出这两种类型的错误。第一类的错误实际上客户端可以识别，并且我们也无法操控HTTP服务器的错误码。第二类的错误信息是一个JSON字符串，例如：{
+    "code": "10000",
+    "message": "Bad email address"
+}
+但是HTTP的返回码应该用啥？var result = JSON.parse(response.data);
+if (result.code) {
+    // 有错误:
+    alert(result.message);
+} else {
+    // 没有错误
+}
+但是，对于静态语言（例如，Java）就比较麻烦，很多时候，不得不做两次序列化：APIError err = objectMapper.readValue(jsonString, APIError.class);
+if (err.code == null) {
+    // 没有错误，还需要重新转换:
+    User user = objectMapper.readValue(jsonString, User.class);
+} else {
+    // 有错误:
+}
+我们强烈建议使用字符串作为错误码。原因在于，使用数字作为错误码时，API提供者需要维护一份错误码代码说明表，并且，该文档必须时刻与API发布同步，否则，客户端开发者遇到一个文档上没有写明的错误码，就完全不知道发生了什么错误。我们定义的REST API错误格式如下：{
+    "code": "错误代码",
+    "message": "错误描述信息"
+}
+user = processLogin(username, password);
+if (user != null) {
+    ctx.rest(user);
+} else {
+    ctx.response.status = 400;
+    ctx.rest({
+        code: 'auth:user_not_found',
+        message: 'user not found'
+    });
+}
+这种方式不好，因为控制流程会混乱，而且，错误只能在Controller函数中输出。user = processLogin(username, password);
+if (user != null) {
+    ctx.rest(user);
+} else {
+    throw new APIError('auth:user_not_found', 'user not found');
+}
+这种方式可以在异步函数的任何地方抛出错误，包括调用的子函数内部。我们只需要稍稍改写一个middleware就可以处理错误：module.exports = {
+    APIError: function (code, message) {
+        this.code = code || 'internal:unknown_error';
+        this.message = message || '';
+    },
+    restify: (pathPrefix) => {
+        pathPrefix = pathPrefix || '/api/';
+        return async (ctx, next) => {
+            if (ctx.request.path.startsWith(pathPrefix)) {
+                // 绑定rest()方法:
+                ctx.rest = (data) => {
+                    ctx.response.type = 'application/json';
+                    ctx.response.body = data;
+                }
+                try {
+                    await next();
+                } catch (e) {
+                    // 返回错误:
+                    ctx.response.status = 400;
+                    ctx.response.type = 'application/json';
+                    ctx.response.body = {
+                        code: e.code || 'internal:unknown_error',
+                        message: e.message || ''
+                    };
+                }
+            } else {
+                await next();
+            }
+        };
+    }
+};
+rest-koa/
+|
++- .vscode/
+|  |
+|  +- launch.json <-- VSCode 配置文件
+|
++- controllers/
+|  |
+|  +- api.js <-- REST API
+|  |
+|  +- index.js <-- MVC Controllers
+|
++- products.js <-- 集中处理Product
+|
++- rest.js <-- 支持REST的middleware
+|
++- app.js <-- 使用koa的js
+|
++- start.js <-- 启动入口js文件
+|
++- controller.js <-- 扫描注册Controller
+|
++- static-files.js <-- 支持静态文件的middleware
+|
++- templating.js <-- 支持Nunjucks的middleware
+|
++- package.json <-- 项目描述文件
+|
++- views/ <-- Nunjucks模板
+|
++- static/ <-- 静态资源文件
+|
++- node_modules/ <-- npm安装的所有依赖包
+"dependencies": {
+    "babel-core": "6.13.2",
+    "babel-polyfill": "6.13.0",
+    "babel-preset-es2015-node6": "0.3.0",
+    "babel-preset-stage-3": "6.5.0",
+    "koa": "2.0.0",
+    "koa-bodyparser": "3.2.0",
+    "koa-router": "7.0.0"
+    "nunjucks": "2.4.2",
+    "mime": "1.3.4",
+    "mz": "2.4.0"
+}
+我们在这个工程中约定了如下规范：REST API的返回值全部是object对象，而不是简单的number、boolean、null或者数组；NSDictionary* dict = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&err];
+如果返回值可能是number、boolean、null或者数组，则客户端的工作量会大大增加。var id = 0;
+
+function nextId() {
+    id++;
+    return 'p' + id;
+}
+
+function Product(name, manufacturer, price) {
+    this.id = nextId();
+    this.name = name;
+    this.manufacturer = manufacturer;
+    this.price = price;
+}
+
+var products = [
+    new Product('iPhone 7', 'Apple', 6800),
+    new Product('ThinkPad T440', 'Lenovo', 5999),
+    new Product('LBP2900', 'Canon', 1099)
+];
+
+module.exports = {
+    getProducts: () => {
+        return products;
+    },
+
+    getProduct: (id) => {
+        var i;
+        for (i = 0; i < products.length; i++) {
+            if (products[i].id === id) {
+                return products[i];
+            }
+        }
+        return null;
+    },
+
+    createProduct: (name, manufacturer, price) => {
+        var p = new Product(name, manufacturer, price);
+        products.push(p);
+        return p;
+    },
+
+    deleteProduct: (id) => {
+        var
+            index = -1,
+            i;
+        for (i = 0; i < products.length; i++) {
+            if (products[i].id === id) {
+                index = i;
+                break;
+            }
+        }
+        if (index >= 0) {
+            // remove products[index]:
+            return products.splice(index, 1)[0];
+        }
+        return null;
+    }
+};
+const products = require('../products');
+
+const APIError = require('../rest').APIError;
+
+module.exports = {
+    'GET /api/products': async (ctx, next) => {
+        ctx.rest({
+            products: products.getProducts()
+        });
+    },
+
+    'POST /api/products': async (ctx, next) => {
+        var p = products.createProduct(ctx.request.body.name, ctx.request.body.manufacturer, parseFloat(ctx.request.body.price));
+        ctx.rest(p);
+    },
+
+    'DELETE /api/products/:id': async (ctx, next) => {
+        console.log(`delete product ${ctx.params.id}...`);
+        var p = products.deleteProduct(ctx.params.id);
+        if (p) {
+            ctx.rest(p);
+        } else {
+            throw new APIError('product:not_found', 'product not found by id.');
+        }
+    }
+};
+该API支持GET、POST和DELETE这三个请求。当然，还可以添加更多的API。编写API时，需要注意：这个功能由koa-router这个middleware提供。有了API以后，我们就可以编写MVC，在页面上调用API完成操作。module.exports = {
+    'GET /': async (ctx, next) => {
+        ctx.render('index.html');
+    }
+};
+$(function () {
+    var vm = new Vue({
+        el: '#product-list',
+        data: {
+            products: []
+        }
+    });
+
+    $.getJSON('/api/products').done(function (data) {
+        vm.products = data.products;
+    }).fail(function (jqXHR, textStatus) {
+        alert('Error: ' + jqXHR.status);
+    });
+});
+与VM对应的HTML如下：

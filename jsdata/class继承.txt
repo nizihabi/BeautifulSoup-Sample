@@ -1,0 +1,47 @@
+在上面的章节中我们看到了JavaScript的对象模型是基于原型实现的，特点是简单，缺点是理解起来比传统的类－实例模型要困难，最大的缺点是继承的实现需要编写大量代码，并且需要正确实现原型链。有没有更简单的写法？有！function Student(name) {
+    this.name = name;
+}
+
+Student.prototype.hello = function () {
+    alert('Hello, ' + this.name + '!');
+}
+class Student {
+    constructor(name) {
+        this.name = name;
+    }
+
+    hello() {
+        alert('Hello, ' + this.name + '!');
+    }
+}
+var xiaoming = new Student('小明');
+xiaoming.hello();
+class PrimaryStudent extends Student {
+    constructor(name, grade) {
+        super(name); // 记得用super调用父类的构造方法!
+        this.grade = grade;
+    }
+
+    myGrade() {
+        alert('I am at grade ' + this.grade);
+    }
+}
+Babelhttps://babeljs.io/
+'use strict';
+
+class Animal {
+    constructor(name) {
+        this.name = name;
+    }
+}
+----
+class Cat ???
+----
+// 测试:
+var kitty = new Cat('Kitty');
+var doraemon = new Cat('哆啦A梦');
+if ((new Cat('x') instanceof Animal) && kitty && kitty.name === 'Kitty' && kitty.say && typeof kitty.say === 'function' && kitty.say() === 'Hello, Kitty!' && kitty.say === doraemon.say) {
+    alert('测试通过!');
+} else {
+    alert('测试失败!');
+}

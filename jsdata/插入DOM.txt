@@ -1,0 +1,95 @@
+当我们获得了某个DOM节点，想在这个DOM节点内插入新的DOM，应该如何做？<!-- HTML结构 -->
+<p id="js">JavaScript</p>
+<div id="list">
+    <p id="java">Java</p>
+    <p id="python">Python</p>
+    <p id="scheme">Scheme</p>
+</div>
+var
+    js = document.getElementById('js'),
+    list = document.getElementById('list');
+list.appendChild(js);
+现在，HTML结构变成了这样：<!-- HTML结构 -->
+<div id="list">
+    <p id="java">Java</p>
+    <p id="python">Python</p>
+    <p id="scheme">Scheme</p>
+    <p id="js">JavaScript</p>
+</div>
+更多的时候我们会从零创建一个新的节点，然后插入到指定位置：var
+    list = document.getElementById('list'),
+    haskell = document.createElement('p');
+haskell.id = 'haskell';
+haskell.innerText = 'Haskell';
+list.appendChild(haskell);
+这样我们就动态添加了一个新的节点：<!-- HTML结构 -->
+<div id="list">
+    <p id="java">Java</p>
+    <p id="python">Python</p>
+    <p id="scheme">Scheme</p>
+    <p id="haskell">Haskell</p>
+</div>
+var d = document.createElement('style');
+d.setAttribute('type', 'text/css');
+d.innerHTML = 'p { color: red }';
+document.getElementsByTagName('head')[0].appendChild(d);
+可以在Chrome的控制台执行上述代码，观察页面样式的变化。<!-- HTML结构 -->
+<div id="list">
+    <p id="java">Java</p>
+    <p id="python">Python</p>
+    <p id="scheme">Scheme</p>
+</div>
+可以这么写：var
+    list = document.getElementById('list'),
+    ref = document.getElementById('python'),
+    haskell = document.createElement('p');
+haskell.id = 'haskell';
+haskell.innerText = 'Haskell';
+list.insertBefore(haskell, ref);
+新的HTML结构如下：<!-- HTML结构 -->
+<div id="list">
+    <p id="java">Java</p>
+    <p id="haskell">Haskell</p>
+    <p id="python">Python</p>
+    <p id="scheme">Scheme</p>
+</div>
+var
+    i, c,
+    list = document.getElementById('list');
+for (i = 0; i < list.children.length; i++) {
+    c = list.children[i]; // 拿到第i个子节点
+}
+对于一个已有的HTML结构：SchemeJavaScriptPythonRubyHaskell<!-- HTML结构 -->
+<ol id="test-list">
+    <li class="lang">Scheme</li>
+    <li class="lang">JavaScript</li>
+    <li class="lang">Python</li>
+    <li class="lang">Ruby</li>
+    <li class="lang">Haskell</li>
+</ol>
+按字符串顺序重新排序DOM节点：
+'use strict';
+----
+// sort list:
+----
+// 测试:
+;(function () {
+    var
+        arr, i,
+        t = document.getElementById('test-list');
+    if (t && t.children && t.children.length === 5) {
+        arr = [];
+        for (i=0; i<t.children.length; i++) {
+            arr.push(t.children[i].innerText);
+        }
+        if (arr.toString() === ['Haskell', 'JavaScript', 'Python', 'Ruby', 'Scheme'].toString()) {
+            alert('测试通过!');
+        }
+        else {
+            alert('测试失败: ' + arr.toString());
+        }
+    }
+    else {
+        alert('测试失败!');
+    }
+})();

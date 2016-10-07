@@ -1,0 +1,70 @@
+// hello.js
+
+module.exports = function (...rest) {
+    var sum = 0;
+    for (let n of rest) {
+        sum += n;
+    }
+    return sum;
+};
+这个函数非常简单，就是对输入的任意参数求和并返回结果。// test.js
+
+const assert = require('assert');
+const sum = require('./hello');
+
+assert.strictEqual(sum(), 0);
+assert.strictEqual(sum(1), 1);
+assert.strictEqual(sum(1, 2), 3);
+assert.strictEqual(sum(1, 2, 3), 6);
+所有APIhttps://nodejs.org/dist/latest/docs/api/assert.html如果有很多测试需要运行，就必须把这些测试全部组织起来，然后统一执行，并且得到执行结果。这就是我们为什么要用mocha来编写并运行测试。hello-test/
+|
++- .vscode/
+|  |
+|  +- launch.json <-- VSCode 配置文件
+|
++- hello.js <-- 待测试js文件
+|
++- test/ <-- 存放所有test
+｜ ｜
+|  +- hello-test.js <-- 测试文件
+|
++- package.json <-- 项目描述文件
+|
++- node_modules/ <-- npm安装的所有依赖包
+{
+  ...
+
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "3.0.2"
+  }
+}
+const assert = require('assert');
+
+const sum = require('../hello');
+
+describe('#hello.js', () => {
+
+    describe('#sum()', () => {
+        it('sum() should return 0', () => {
+            assert.strictEqual(sum(), 0);
+        });
+
+        it('sum(1) should return 1', () => {
+            assert.strictEqual(sum(1), 1);
+        });
+
+        it('sum(1, 2) should return 3', () => {
+            assert.strictEqual(sum(1, 2), 3);
+        });
+
+        it('sum(1, 2, 3) should return 6', () => {
+            assert.strictEqual(sum(1, 2, 3), 6);
+        });
+    });
+});
+it('sum(1, 2) should return 3', () => {
+    assert.strictEqual(sum(1, 2), 3);
+});
+下一步，我们就可以用mocha运行测试了。如何运行？有三种方法。C:\...\hello-test> node_modules\mocha\bin\mocha
+mocha就会自动执行所有测试，然后输出如下：

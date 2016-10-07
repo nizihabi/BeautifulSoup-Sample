@@ -1,0 +1,116 @@
+因为underscore本来就是为了充分发挥JavaScript的函数式编程特性，所以也提供了大量JavaScript本身没有的高阶函数。'use strict';
+
+console.log('Hello, world!');
+// 输出'Hello, world!'
+
+var log = console.log;
+log('Hello, world!');
+// Uncaught TypeError: Illegal invocation
+'use strict';
+
+var log = console.log;
+// 调用call并传入console对象作为this:
+log.call(console, 'Hello, world!')
+// 输出Hello, world!
+'use strict';
+
+var log = _.bind(console.log, console);
+log('Hello, world!');
+// 输出Hello, world!
+yy'use strict';
+
+var pow2N = _.partial(Math.pow, 2);
+pow2N(3); // 8
+pow2N(5); // 32
+pow2N(10); // 1024
+3'use strict';
+
+var cube = _.partial(Math.pow, _, 3);
+cube(3); // 27
+cube(5); // 125
+cube(10); // 1000
+可见，创建偏函数的目的是将原函数的某些参数固定住，可以降低新函数调用的难度。如果一个函数调用开销很大，我们就可能希望能把结果缓存下来，以便后续调用时直接获得结果。举个例子，计算阶乘就比较耗时：'use strict';
+
+function factorial(n) {
+    console.log('start calculate ' + n + '!...');
+    var s = 1, i = n;
+    while (i > 1) {
+        s = s * i;
+        i --;
+    }
+    console.log(n + '! = ' + s);
+    return s;
+}
+
+factorial(10); // 3628800
+// 注意控制台输出:
+// start calculate 10!...
+// 10! = 3628800
+'use strict';
+
+var factorial = _.memoize(function(n) {
+    console.log('start calculate ' + n + '!...');
+    var s = 1, i = n;
+    while (i > 1) {
+        s = s * i;
+        i --;
+    }
+    console.log(n + '! = ' + s);
+    return s;
+});
+
+// 第一次调用:
+factorial(10); // 3628800
+// 注意控制台输出:
+// start calculate 10!...
+// 10! = 3628800
+
+// 第二次调用:
+factorial(10); // 3628800
+// 控制台没有输出
+'use strict';
+
+var factorial = _.memoize(function(n) {
+    console.log('start calculate ' + n + '!...');
+    if (n < 2) {
+        return 1;
+    }
+    return n * factorial(n - 1);
+});
+
+factorial(10); // 3628800
+// 输出结果说明factorial(1)~factorial(10)都已经缓存了:
+// start calculate 10!...
+// start calculate 9!...
+// start calculate 8!...
+// start calculate 7!...
+// start calculate 6!...
+// start calculate 5!...
+// start calculate 4!...
+// start calculate 3!...
+// start calculate 2!...
+// start calculate 1!...
+
+factorial(9); // 362880
+// console无输出
+
+'use strict';
+----
+var register = _.once(function () {
+    alert('Register ok!');
+});
+----
+// 测试效果:
+register();
+register();
+register();
+'use strict';
+
+// 2秒后调用alert():
+_.delay(alert, 2000);
+如果要延迟调用的函数有参数，把参数也传进去：'use strict';
+
+var log = _.bind(console.log, console);
+_.delay(log, 2000, 'Hello,', 'world!');
+// 2秒后打印'Hello, world!':
+http://underscorejs.org/#functionshttp://underscorejs.org/#functions

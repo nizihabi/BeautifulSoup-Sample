@@ -1,0 +1,96 @@
+用JavaScript实现动画，原理非常简单：我们只需要以固定的时间间隔（例如，0.1秒），每次把DOM元素的CSS样式修改一点（例如，高宽各增加10%），看起来就像动画了。但是要用JavaScript手动实现动画效果，需要编写非常复杂的代码。如果想要把动画效果用函数封装起来便于复用，那考虑的事情就更多了。使用jQuery实现动画，代码已经简单得不能再简化了：只需要一行代码！让我们先来看看jQuery内置的几种动画样式：var div = $('#test-show-hide');
+div.hide(3000); // 在3秒钟内逐渐消失
+var div = $('#test-show-hide');
+div.show('slow'); // 在0.6秒钟内逐渐显示
+效果实测：var div = $('#test-slide');
+div.slideUp(3000); // 在3秒钟内逐渐向上消失
+效果实测：var div = $('#test-fade');
+div.fadeOut('slow'); // 在0.6秒内淡出
+var div = $('#test-animate');
+div.animate({
+    opacity: 0.25,
+    width: '256px',
+    height: '256px'
+}, 3000); // 在3秒钟内CSS过渡到设定值
+var div = $('#test-animate');
+div.animate({
+    opacity: 0.25,
+    width: '256px',
+    height: '256px'
+}, 3000, function () {
+    console.log('动画已结束');
+    // 恢复至初始状态:
+    $(this).css('opacity', '1.0').css('width', '128px').css('height', '128px');
+});
+实际上这个回调函数参数对于基本动画也是适用的。
+function customAnimate() {
+    $('#test-animate').animate({
+        opacity: 0.25,
+        width: '256px',
+        height: '256px'
+    }, 3000, function() {
+        $(this).css('opacity', '1.0').css('width', '128px').css('height', '128px');
+    });
+}
+var div = $('#test-animates');
+// 动画效果：slideDown - 暂停 - 放大 - 暂停 - 缩小
+div.slideDown(2000)
+   .delay(1000)
+   .animate({
+       width: '256px',
+       height: '256px'
+   }, 2000)
+   .delay(1000)
+   .animate({
+       width: '128px',
+       height: '128px'
+   }, 2000);
+}
+</script>
+因为动画需要执行一段时间，所以jQuery必须不断返回新的Promise对象才能后续执行操作。简单地把动画封装在函数中是不够的。效果实测：
+function animates() {
+    $('#test-animates')
+        .hide()
+        .slideDown(2000)
+        .delay(1000)
+        .animate({
+            width: '256px',
+            height: '256px'
+        }, 2000)
+        .delay(1000)
+        .animate({
+            width: '128px',
+            height: '128px'
+        }, 2000);
+}
+
+'use strict';
+
+function deleteFirstTR() {
+    var tr = $('#test-table>tbody>tr:visible').first();
+----
+----
+}
+
+deleteFirstTR();
+
+$(function () {
+    var trs = [['Bart Simpson', 'bart.s@primary.school', 'Springfield', 'Active'],
+               ['Michael Scofield', 'm.scofield@escape.org', 'Fox River', 'Locked'],
+               ['Optimus Prime', 'prime@cybertron.org', 'Cybertron', 'Active'],
+               ['Peter Parker', 'spider@movie.org', 'New York', 'Active'],
+               ['Thor Odinson', 'thor@asgard.org', 'Asgard', 'Active']];
+    var tbody = $('#test-table>tbody');
+    var i;
+    for (i=0; i < trs.length; i++) {
+        tbody.append('<tr><td>' + trs[i].join('</td><td>') + '</td></tr>');
+    }
+    i = 0;
+    $('#test-add-button').click(function () {
+        if (i>=trs.length) {
+            i = 0;
+        }
+        tbody.append('<tr><td>' + trs[i].join('</td><td>') + '</td></tr>');
+        i ++;
+    });
+});

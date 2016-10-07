@@ -1,0 +1,41 @@
+单向绑定非常简单，就是把Model绑定到View，当我们用JavaScript代码更新Model时，View就会自动更新。有单向绑定，就有双向绑定。如果用户更新了View，Model的数据也自动被更新了，这种情况就是双向绑定。什么情况下用户可以更新View呢？填写表单就是一个最直接的例子。当用户填写表单时，View的状态就被更新了，如果此时MVVM框架可以自动更新Model的状态，那就相当于我们把Model和View做了双向绑定：在浏览器中，当用户修改了表单的内容时，我们绑定的Model会自动更新：在Vue中，使用双向绑定非常容易，我们仍然先创建一个VM实例：$(function () {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            email: '',
+            name: ''
+        }
+    });
+    window.vm = vm;
+});
+<form id="vm" action="#">
+    <p><input v-model="email"></p>
+    <p><input v-model="name"></p>
+</form>
+多个checkbox可以和数组绑定：<label><input type="checkbox" v-model="language" value="zh"> Chinese</label>
+<label><input type="checkbox" v-model="language" value="en"> English</label>
+<label><input type="checkbox" v-model="language" value="fr"> French</label>
+对应的Model为：language: ['zh', 'en']
+单个checkbox可以和boolean类型变量绑定：<input type="checkbox" v-model="subscribe">
+对应的Model为：subscribe: true; // 根据checkbox是否选中为true/false
+<select v-model="city">
+    <option value="bj">Beijing</option>
+    <option value="sh">Shanghai</option>
+    <option value="gz">Guangzhou</option>
+</select>
+对应的Model为：city: 'bj' // 对应option的value
+双向绑定最大的好处是我们不再需要用jQuery去查询表单的状态，而是直接获得了用JavaScript对象表示的Model。现在，获取表单内容已经不需要了，因为双向绑定直接让我们获得了表单内容，并且获得了合适的数据类型。<form id="vm" v-on:submit.prevent="register">
+var vm = new Vue({
+    el: '#vm',
+    data: {
+        ...
+    },
+    methods: {
+        register: function () {
+            // 显示JSON格式的Model:
+            alert(JSON.stringify(this.$data));
+            // TODO: AJAX POST...
+        }
+    }
+});
+使用CSS修饰后的页面效果如下：form-vueform-vuehttps://github.com/michaelliao/learn-javascript/tree/master/samples/node/web/vue/form-vue

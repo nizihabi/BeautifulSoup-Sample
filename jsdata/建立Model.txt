@@ -1,0 +1,216 @@
+直接使用Sequelize虽然可以，但是存在一些问题。团队开发时，有人喜欢自己加timestamp：var Pet = sequelize.define('pet', {
+    id: {
+        type: Sequelize.STRING(50),
+        primaryKey: true
+    },
+    name: Sequelize.STRING(100),
+    createdAt: Sequelize.BIGINT,
+    updatedAt: Sequelize.BIGINT
+}, {
+        timestamps: false
+    });
+有人又喜欢自增主键，并且自定义表名：var Pet = sequelize.define('pet', {
+    id: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    name: Sequelize.STRING(100)
+}, {
+        tableName: 't_pet'
+    });
+一个大型Web App通常都有几十个映射表，一个映射表就是一个Model。如果按照各自喜好，那业务代码就不好写。Model不统一，很多代码也无法复用。所以我们需要一个统一的模型，强迫所有Model都遵守同一个规范，这样不但实现简单，而且容易统一风格。其次，每个Model必须遵守一套规范：主键可以自己指定，也可以由框架自动生成（如果为null或undefined）；const db = require('../db');
+
+module.exports = db.defineModel('users', {
+    email: {
+        type: db.STRING(100),
+        unique: true
+    },
+    passwd: db.STRING(100),
+    name: db.STRING(100),
+    gender: db.BOOLEAN
+});
+const Sequelize = require('sequelize');
+
+console.log('init sequelize...');
+
+var sequelize = new Sequelize('dbname', 'username', 'password', {
+    host: 'localhost',
+    dialect: 'mysql',
+    pool: {
+        max: 5,
+        min: 0,
+        idle: 10000
+    }
+});
+
+const ID_TYPE = Sequelize.STRING(50);
+
+function defineModel(name, attributes) {
+    var attrs = {};
+    for (let key in attributes) {
+        let value = attributes[key];
+        if (typeof value === 'object' && value['type']) {
+            value.allowNull = value.allowNull || false;
+            attrs[key] = value;
+        } else {
+            attrs[key] = {
+                type: value,
+                allowNull: false
+            };
+        }
+    }
+    attrs.id = {
+        type: ID_TYPE,
+        primaryKey: true
+    };
+    attrs.createdAt = {
+        type: Sequelize.BIGINT,
+        allowNull: false
+    };
+    attrs.updatedAt = {
+        type: Sequelize.BIGINT,
+        allowNull: false
+    };
+    attrs.version = {
+        type: Sequelize.BIGINT,
+        allowNull: false
+    };
+    return sequelize.define(name, attrs, {
+        tableName: name,
+        timestamps: false,
+        hooks: {
+            beforeValidate: function (obj) {
+                let now = Date.now();
+                if (obj.isNewRecord) {
+                    if (!obj.id) {
+                        obj.id = generateId();
+                    }
+                    obj.createdAt = now;
+                    obj.updatedAt = now;
+                    obj.version = 0;
+                } else {
+                    obj.updatedAt = Date.now();
+                    obj.version++;
+                }
+            }
+        }
+    });
+}
+这么一来，Model定义的时候就可以大大简化。config-default.js：存储默认的配置；config-override.js：存储特定的配置；config-test.js：存储用于测试的配置。var config = {
+    dialect: 'mysql',
+    database: 'nodejs',
+    username: 'www',
+    password: 'www',
+    host: 'localhost',
+    port: 3306
+};
+
+module.exports = config;
+var config = {
+    database: 'production',
+    username: 'www',
+    password: 'secret-password',
+    host: '192.168.1.199'
+};
+
+module.exports = config;
+var config = {
+    database: 'test'
+};
+
+module.exports = config;
+const defaultConfig = './config-default.js';
+// 可设定为绝对路径，如 /opt/product/config-override.js
+const overrideConfig = './config-override.js';
+const testConfig = './config-test.js';
+
+const fs = require('fs');
+
+var config = null;
+
+if (process.env.NODE_ENV === 'test') {
+    console.log(`Load ${testConfig}...`);
+    config = require(testConfig);
+} else {
+    console.log(`Load ${defaultConfig}...`);
+    config = require(defaultConfig);
+    try {
+        if (fs.statSync(overrideConfig).isFile()) {
+            console.log(`Load ${overrideConfig}...`);
+            config = Object.assign(config, require(overrideConfig));
+        }
+    } catch (err) {
+        console.log(`Cannot load ${overrideConfig}.`);
+    }
+}
+
+module.exports = config;
+具体的规则是：配置文件表面上写起来很容易，但是，既要保证开发效率，又要避免服务器配置文件泄漏，还要能方便地执行测试，就需要一开始搭建出好的结构，才能提升工程能力。const fs = require('fs');
+const db = require('./db');
+
+let files = fs.readdirSync(__dirname + '/models');
+
+let js_files = files.filter((f)=>{
+    return f.endsWith('.js');
+}, files);
+
+module.exports = {};
+
+for (let f of js_files) {
+    console.log(`import model from file ${f}...`);
+    let name = f.substring(0, f.length - 3);
+    module.exports[name] = require(__dirname + '/models/' + f);
+}
+
+module.exports.sync = () => {
+    db.sync();
+};
+这样，需要用的时候，写起来就像这样：const model = require('./model');
+
+let
+    Pet = model.Pet,
+    User = model.User;
+
+var pet = await Pet.create({ ... });
+model-sequelize/
+|
++- .vscode/
+|  |
+|  +- launch.json <-- VSCode 配置文件
+|
++- models/ <-- 存放所有Model
+|  |
+|  +- Pet.js <-- Pet
+|  |
+|  +- User.js <-- User
+|
++- config.js <-- 配置文件入口
+|
++- config-default.js <-- 默认配置文件
+|
++- config-test.js <-- 测试配置文件
+|
++- db.js <-- 如何定义Model
+|
++- model.js <-- 如何导入Model
+|
++- init-db.js <-- 初始化数据库
+|
++- app.js <-- 业务代码
+|
++- start.js <-- 启动入口js
+|
++- package.json <-- 项目描述文件
+|
++- node_modules/ <-- npm安装的所有依赖包
+require('babel-core/register')({
+    presets: ['stage-3']
+});
+
+const model = require('./model.js');
+model.sync();
+
+console.log('init db ok.');
+process.exit(0);
+它最大的好处是避免了手动维护一个SQL脚本。model-sequelizemodel-sequelizehttps://github.com/michaelliao/learn-javascript/tree/master/samples/node/web/db/model-sequelize

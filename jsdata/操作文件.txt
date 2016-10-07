@@ -1,0 +1,84 @@
+
+$(function () {
+    var
+        fileInput = document.getElementById('test-file-upload'),
+        filePath = document.getElementById('test-get-filename');
+    fileInput.addEventListener('change', function () {
+        filePath.innerText = fileInput.value;
+    });
+});
+
+通常，上传的文件都由后台服务器处理，JavaScript可以在提交表单时对文件扩展名做检查，以便防止用户上传无效格式的文件：var f = document.getElementById('test-file-upload');
+var filename = f.value; // 'C:\fakepath\test.png'
+if (!filename || !(filename.endsWith('.jpg') || filename.endsWith('.png') || filename.endsWith('.gif'))) {
+    alert('Can only upload image file.');
+    return false;
+}
+由于JavaScript对用户上传的文件操作非常有限，尤其是无法读取文件内容，使得很多需要操作文件的网页不得不用Flash这样的第三方插件来实现。随着HTML5的普及，新增的File API允许JavaScript读取文件内容，获得更多的文件信息。
+$(function() {
+    var fileInput = document.getElementById('test-image-file');
+    var info = document.getElementById('test-file-info');
+    var preview = document.getElementById('test-image-preview');
+    fileInput.addEventListener('change', function () {
+        preview.style.backgroundImage = '';
+        if (!fileInput.value) {
+            info.innerHTML = '没有选择文件';
+            return;
+        }
+        var file = fileInput.files[0];
+        info.innerHTML = '文件: ' + file.name + '<br>' +
+                         '大小: ' + file.size + '<br>' +
+                         '修改: ' + file.lastModifiedDate;
+        if (file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/gif') {
+            alert('不是有效的图片文件!');
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var
+                data = e.target.result;
+                index = data.indexOf(';base64,');
+            preview.style.backgroundImage = 'url(' + data + ')';
+        };
+        reader.readAsDataURL(file);
+    });
+});
+图片预览：
+var
+    fileInput = document.getElementById('test-image-file'),
+    info = document.getElementById('test-file-info'),
+    preview = document.getElementById('test-image-preview');
+// 监听change事件:
+fileInput.addEventListener('change', function () {
+    // 清除背景图片:
+    preview.style.backgroundImage = '';
+    // 检查文件是否选择:
+    if (!fileInput.value) {
+        info.innerHTML = '没有选择文件';
+        return;
+    }
+    // 获取File引用:
+    var file = fileInput.files[0];
+    // 获取File信息:
+    info.innerHTML = '文件: ' + file.name + '<br>' +
+                     '大小: ' + file.size + '<br>' +
+                     '修改: ' + file.lastModifiedDate;
+    if (file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/gif') {
+        alert('不是有效的图片文件!');
+        return;
+    }
+    // 读取文件:
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var
+            data = e.target.result; // 'data:image/jpeg;base64,/9j/4AAQSk...(base64编码)...'            
+        preview.style.backgroundImage = 'url(' + data + ')';
+    };
+    // 以DataURL的形式读取文件:
+    reader.readAsDataURL(file);
+});
+上面的代码还演示了JavaScript的一个重要的特性就是单线程执行模式。在JavaScript中，浏览器的JavaScript执行引擎在执行JavaScript代码时，总是以单线程模式执行，也就是说，任何时候，JavaScript代码都不可能同时有多于1个线程在执行。你可能会问，单线程模式执行的JavaScript，如何处理多任务？在JavaScript中，执行多任务实际上都是异步调用，比如上面的代码：reader.readAsDataURL(file);
+就会发起一个异步操作来读取文件内容。因为是异步操作，所以我们在JavaScript代码中就不知道什么时候操作结束，因此需要先设置一个回调函数：reader.onload = function(e) {
+    // 当文件读取完成后，自动调用此函数:
+};
+当文件读取完成后，JavaScript引擎将自动调用我们设置的回调函数。执行回调函数时，文件已经读取完毕，所以我们可以在回调函数内部安全地获得文件内容。

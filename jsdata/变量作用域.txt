@@ -1,0 +1,125 @@
+如果一个变量在函数体内部申明，则该变量的作用域为整个函数体，在函数体外不可引用该变量：'use strict';
+
+function foo() {
+    var x = 1;
+    x = x + 1;
+}
+
+x = x + 2; // ReferenceError! 无法在函数体外引用变量x
+如果两个不同的函数各自申明了同一个变量，那么该变量只在各自的函数体内起作用。换句话说，不同函数内部的同名变量互相独立，互不影响：'use strict';
+
+function foo() {
+    var x = 1;
+    x = x + 1;
+}
+
+function bar() {
+    var x = 'A';
+    x = x + 'B';
+}
+由于JavaScript的函数可以嵌套，此时，内部函数可以访问外部函数定义的变量，反过来则不行：'use strict';
+
+function foo() {
+    var x = 1;
+    function bar() {
+        var y = x + 1; // bar可以访问foo的变量x!
+    }
+    var z = y + 1; // ReferenceError! foo不可以访问bar的变量y!
+}
+如果内部函数和外部函数的变量名重名怎么办？'use strict';
+
+function foo() {
+    var x = 1;
+    function bar() {
+        var x = 'A';
+        alert('x in bar() = ' + x); // 'A'
+    }
+    alert('x in foo() = ' + x); // 1
+    bar();
+}
+这说明JavaScript的函数在查找变量时从自身函数定义开始，从“内”向“外”查找。如果内部函数定义了与外部函数重名的变量，则内部函数的变量将“屏蔽”外部函数的变量。JavaScript的函数定义有个特点，它会先扫描整个函数体的语句，把所有申明的变量“提升”到函数顶部：'use strict';
+
+function foo() {
+    var x = 'Hello, ' + y;
+    alert(x);
+    var y = 'Bob';
+}
+
+foo();
+function foo() {
+    var y; // 提升变量y的申明
+    var x = 'Hello, ' + y;
+    alert(x);
+    y = 'Bob';
+}
+function foo() {
+    var
+        x = 1, // x初始化为1
+        y = x + 1, // y初始化为2
+        z, i; // z和i为undefined
+    // 其他语句:
+    for (i=0; i<100; i++) {
+        ...
+    }
+}
+'use strict';
+
+var course = 'Learn JavaScript';
+alert(course); // 'Learn JavaScript'
+alert(window.course); // 'Learn JavaScript'
+'use strict';
+
+function foo() {
+    alert('foo');
+}
+
+foo(); // 直接调用foo()
+window.foo(); // 通过window.foo()调用
+
+'use strict';
+
+window.alert('调用window.alert()');
+// 把alert保存到另一个变量:
+var old_alert = window.alert;
+// 给alert赋一个新函数:
+window.alert = function () {}
+----
+alert('无法用alert()显示了!');
+----
+// 恢复alert:
+window.alert = old_alert;
+alert('又可以用alert()了!');
+这说明JavaScript实际上只有一个全局作用域。任何变量（函数也视为变量），如果没有在当前函数作用域中找到，就会继续往上查找，最后如果在全局作用域中也没有找到，则报ReferenceError错误。减少冲突的一个方法是把自己的所有变量和函数全部绑定到一个全局变量中。例如：// 唯一的全局变量MYAPP:
+var MYAPP = {};
+
+// 其他变量:
+MYAPP.name = 'myapp';
+MYAPP.version = 1.0;
+
+// 其他函数:
+MYAPP.foo = function () {
+    return 'foo';
+};
+许多著名的JavaScript库都是这么干的：jQuery，YUI，underscore等等。'use strict';
+
+function foo() {
+    for (var i=0; i<100; i++) {
+        //
+    }
+    i += 100; // 仍然可以引用变量i
+}
+'use strict';
+
+function foo() {
+    var sum = 0;
+    for (let i=0; i<100; i++) {
+        sum += i;
+    }
+    i += 1; // SyntaxError
+}
+var PI = 3.14;
+'use strict';
+
+const PI = 3.14;
+PI = 3; // 某些浏览器不报错，但是无效果！
+PI; // 3.14

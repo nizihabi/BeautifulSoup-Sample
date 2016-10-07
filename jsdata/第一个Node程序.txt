@@ -1,0 +1,24 @@
+在前面的所有章节中，我们编写的JavaScript代码都是在浏览器中运行的，因此，我们可以直接在浏览器中敲代码，然后直接运行。那么问题来了：文本编辑器到底哪家强？绝对不能用Word和写字板所以，用记事本写代码时请注意，保存文件时使用ANSI编码，并且暂时不要输入中文。Sublime Texthttp://www.sublimetext.com/Notepad++http://notepad-plus-plus.org/输入以下代码：'use strict';
+
+console.log('Hello, world.');
+C:\Workspace>node hello.js
+Hello, world.
+C:\Workspace>node hello.js
+module.js:338
+    throw err;
+          ^
+Error: Cannot find module 'C:\Workspace\hello.js'
+    at Function.Module._resolveFilename
+    at Function.Module._load
+    at Function.Module.runMain
+    at startup
+    at node.js
+请注意区分命令行模式和Node交互模式。在Node交互式环境下，我们可以输入JavaScript代码并立刻执行。例如，在Node交互式环境下，输入：> 100 + 200 + 300;
+600
+100 + 200 + 300;
+然后在命令行模式下执行：C:\Workspace>node calc.js
+发现什么输出都没有。console.log(100 + 200 + 300);
+再执行，就可以看到结果：C:\Workspace>node calc.js
+600
+node --use_strict calc.js
+在编写JavaScript代码的时候，完全可以一边在文本编辑器里写代码，一边开一个Node交互式命令窗口，在写代码的过程中，把部分代码粘到命令行去验证，事半功倍！前提是得有个27'的超大显示器！hello.js和calc.jshello.js和calc.jshttps://github.com/michaelliao/learn-javascript/tree/master/samples/node/first

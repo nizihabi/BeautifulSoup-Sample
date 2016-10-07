@@ -1,0 +1,109 @@
+在上一节中，我们用Vue实现了一个简单的TODO应用。通过对Model的更新，DOM结构可以同步更新。现在，如果要把这个简单的TODO应用变成一个用户能使用的Web应用，我们需要解决几个问题：用户的TODO数据应该从后台读取；对TODO的增删改必须同步到服务器后端；用户在View上必须能够修改TODO。第1个和第2个问题都是和API相关的。只要我们实现了合适的API接口，就可以在MVVM内部更新Model的同时，通过API把数据更新反映到服务器端，这样，用户数据就保存到了服务器端，下次打开页面时就可以读取TODO列表。vue-todo-2/
+|
++- .vscode/
+|  |
+|  +- launch.json <-- VSCode 配置文件
+|
++- app.js <-- koa app
+|
++- start.js <-- 入口js
+|
++- static-files.js <-- 支持静态文件的koa middleware
+|
++- controller.js <-- 支持路由的koa middleware
+|
++- rest.js <-- 支持REST的koa middleware
+|
++- package.json <-- 项目描述文件
+|
++- node_modules/ <-- npm安装的所有依赖包
+|
++- controllers/ <-- 存放Controller
+|  |
+|  +- api.js <-- REST API
+|
++- static/ <-- 存放静态资源文件
+   |
+   +- css/ <-- 存放bootstrap.css等
+   |
+   +- fonts/ <-- 存放字体文件
+   |
+   +- js/ <-- 存放各种js文件
+   |
+   +- index.html <-- 使用MVVM的静态页面
+GET /api/todos：返回所有TODO列表；POST /api/todos：创建一个新的TODO，并返回创建后的对象；PUT /api/todos/:id：更新一个TODO，并返回更新后的对象；DELETE /api/todos/:id：删除一个TODO。准备好API后，在Vue中，我们如何把Model的更新同步到服务器端？有两个方法，一是直接用jQuery的AJAX调用REST API，不过这种方式比较麻烦。vue-resourcehttps://github.com/vuejs/vue-resource<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+var vm = new Vue({
+    el: '#vm',
+    data: {
+        title: 'TODO List',
+        todos: []
+    },
+    created: function () {
+        this.init();
+    },
+    methods: {
+        init: function () {
+            var that = this;
+            that.$resource('/api/todos').get().then(function (resp) {
+                // 调用API成功时调用json()异步返回结果:
+                resp.json().then(function (result) {
+                    // 更新VM的todos:
+                    that.todos = result.todos;
+                });
+            }, function (resp) {
+                // 调用API失败:
+                alert('error');
+            });
+        }
+    }
+});
+类似的，对于添加、修改、删除的操作，我们也需要往VM中添加对应的函数。以添加为例：var vm = new Vue({
+    ...
+    methods: {
+        ...
+        create: function (todo) {
+            var that = this;
+            that.$resource('/api/todos').save(todo).then(function (resp) {
+                resp.json().then(function (result) {
+                    that.todos.push(result);
+                });
+            }, showError);
+        },
+        update: function (todo, prop, e) {
+            ...
+        },
+        remove: function (todo) {
+            ...
+        }
+    }
+});
+var vmAdd = new Vue({
+    el: '#vmAdd',
+    data: {
+        name: '',
+        description: ''
+    },
+    methods: {
+        submit: function () {
+            vm.create(this.$data);
+        }
+    }
+});
+<form id="vmAdd" action="#0" v-on:submit.prevent="submit">
+    <p><input type="text" v-model="name"></p>
+    <p><input type="text" v-model="description"></p>
+    <p><button type="submit">Add</button></p>
+</form>
+<div id="vm">
+    <h3>{{ title }}</h3>
+    <ol>
+        <li v-for="t in todos">
+            <dl>
+                <dt contenteditable="true" v-on:blur="update(t, 'name', $event)">{{ t.name }}</dt>
+                <dd contenteditable="true" v-on:blur="update(t, 'description', $event)">{{ t.description }}</dd>
+                <dd><a href="#0" v-on:click="remove(t)">Delete</a></dd>
+            </dl>
+        </li>
+    </ol>
+</div>
+通过Vue和vue-resource插件，我们用简单的几十行代码就实现了一个真正可用的TODO应用。使用CSS修饰后的页面效果如下：vue-todo-2vue-todo-2https://github.com/michaelliao/learn-javascript/tree/master/samples/node/web/vue/vue-todo-2

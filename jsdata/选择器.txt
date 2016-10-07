@@ -1,0 +1,82 @@
+为什么jQuery要发明选择器？回顾一下DOM操作中我们经常使用的代码：// 按ID查找：
+var a = document.getElementById('dom-id');
+
+// 按tag查找：
+var divs = document.getElementsByTagNames('div');
+
+// 查找<p class="red">：
+var ps = document.getElementsByTagNames('p');
+// 过滤出class="red":
+// TODO:
+
+// 查找<table class="green">里面的所有<tr>：
+var table = ...
+for (var i=0; i<table.children; i++) {
+    // TODO: 过滤出<tr>
+}
+<table>
+    <tbody>
+        <tr>...</tr>
+        <tr>...</tr>
+    </tbody>
+</table>
+很多时候，需要递归查找所有子节点。jQuery的选择器就是帮助我们快速定位到一个或多个DOM节点。// 查找<div id="abc">:
+var div = $('#abc');
+什么是jQuery对象？jQuery对象类似数组，它的每个元素都是一个引用了DOM节点的对象。[<div id="abc">...</div>]
+[]
+jQuery对象和DOM对象之间可以互相转化：var div = $('#abc'); // jQuery对象
+var divDom = div.get(0); // 假设存在div，获取第1个DOM元素
+var another = $(divDom); // 重新把DOM包装为jQuery对象
+按tag查找只需要写上tag名称就可以了：var ps = $('p'); // 返回所有<p>节点
+ps.length; // 数一数页面有多少个<p>节点
+var a = $('.red'); // 所有节点包含`class="red"`都将返回
+// 例如:
+// <div class="red">...</div>
+// <p class="green red">...</p>
+var a = $('.red.green'); // 注意没有空格！
+// 符合条件的节点：
+// <div class="red green">...</div>
+// <div class="blue green red">...</div>
+var email = $('[name=email]'); // 找出<??? name="email">
+var passwordInput = $('[type=password]'); // 找出<??? type="password">
+var a = $('[items="A B"]'); // 找出<??? items="A B">
+当属性的值包含空格等特殊字符时，需要用双引号括起来。按属性查找还可以使用前缀查找或者后缀查找：var icons = $('[name^=icon]'); // 找出所有name属性值以icon开头的DOM
+// 例如: name="icon-1", name="icon-2"
+var names = $('[name$=with]'); // 找出所有name属性值以with结尾的DOM
+// 例如: name="startswith", name="endswith"
+这个方法尤其适合通过class属性查找，且不受class包含多个名称的影响：var icons = $('[class^="icon-"]'); // 找出所有class包含至少一个以`icon-`开头的DOM
+// 例如: class="icon-clock", class="abc icon-home"
+var emailInput = $('input[name=email]'); // 不会找出<div name="email">
+同样的，根据tag和class来组合查找也很常见：var tr = $('tr.red'); // 找出<tr class="red ...">...</tr>
+$('p,div'); // 把<p>和<div>都选出来
+$('p.red,p.green'); // 把<p class="red">和<p class="green">都选出来
+使用jQuery选择器分别选出指定元素：仅选择JavaScript仅选择Erlang选择JavaScript和Erlang选择所有编程语言选择名字input选择邮件和名字input<!-- HTML结构 -->
+<div id="test-jquery">
+    <p id="para-1" class="color-red">JavaScript</p>
+    <p id="para-2" class="color-green">Haskell</p>
+    <p class="color-red color-green">Erlang</p>
+    <p name="name" class="color-black">Python</p>
+    <form class="test-form" target="_blank" action="#0" onsubmit="return false;">
+        <legend>注册新用户</legend>
+        <fieldset>
+            <p><label>名字: <input name="name"></label></p>
+            <p><label>邮件: <input name="email"></label></p>
+            <p><label>口令: <input name="password" type="password"></label></p>
+            <p><button type="submit">注册</button></p>
+        </fieldset>
+    </form>
+</div>
+运行查看结果：
+'use strict';
+
+var selected = null;
+----
+selected = ???;
+----
+// 高亮结果:
+if (!(selected instanceof jQuery)) {
+    return alert('不是有效的jQuery对象!');
+}
+$('#test-jquery').find('*').css('background-color', '');
+selected.css('background-color', '#ffd351');
+JavaScriptHaskellErlangPython注册
