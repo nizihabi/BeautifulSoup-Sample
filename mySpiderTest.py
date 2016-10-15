@@ -4,10 +4,10 @@ from collections import OrderedDict
 import re
 import os
 
-BASE_URL = r"http://www.liaoxuefeng.com/wiki/001434446689867b27157e896e74d51a89c25cc8b43bdb3000"
-START_ID = "001434446689867b27157e896e74d51a89c25cc8b43bdb3000"
+BASE_URL = r"http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000"
+START_ID = "0014316089557264a6b348958f449949df42a6d3a2e542c000"
 
-dir = "./jsdata"  #储存爬虫下来的数据的目录，按网站的目录进行分类保存
+dir = "./data"  #储存爬虫下来的数据的目录，按网站的目录进行分类保存
 
 #保存某个分支目录下的信息
 def saveContent(contInfo,filename):

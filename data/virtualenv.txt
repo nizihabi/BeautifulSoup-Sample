@@ -1,0 +1,19 @@
+如果我们要同时开发多个应用程序，那这些应用程序都会共用一个Python，就是安装在系统的Python 3。如果应用A需要jinja 2.7，而应用B需要jinja 2.6怎么办？这种情况下，每个应用可能需要各自拥有一套“独立”的Python运行环境。virtualenv就是用来为一个应用创建一套“隔离”的Python运行环境。$ pip3 install virtualenv
+然后，假定我们要开发一个新的项目，需要一套独立的Python运行环境，可以这么做：第一步，创建目录：Mac:~ michael$ mkdir myproject
+Mac:~ michael$ cd myproject/
+Mac:myproject michael$
+Mac:myproject michael$ virtualenv --no-site-packages venv
+Using base prefix '/usr/local/.../Python.framework/Versions/3.4'
+New python executable in venv/bin/python3.4
+Also creating executable in venv/bin/python
+Installing setuptools, pip, wheel...done.
+Mac:myproject michael$ source venv/bin/activate
+(venv)Mac:myproject michael$
+(venv)Mac:myproject michael$ pip install jinja2
+...
+Successfully installed jinja2-2.7.3 markupsafe-0.23
+(venv)Mac:myproject michael$ python myapp.py
+...
+(venv)Mac:myproject michael$ deactivate 
+Mac:myproject michael$
+完全可以针对每个应用创建独立的Python运行环境，这样就可以对每个应用的Python环境进行隔离。virtualenv为应用提供了隔离的Python运行环境，解决了不同应用间多版本的冲突问题。

@@ -1,0 +1,29 @@
+在介绍函数参数的时候，我们讲到，通过设定参数的默认值，可以降低函数调用的难度。而偏函数也可以做到这一点。举例如下：>>> int('12345')
+12345
+>>> int('12345', base=8)
+5349
+>>> int('12345', 16)
+74565
+def int2(x, base=2):
+    return int(x, base)
+这样，我们转换二进制就非常方便了：>>> int2('1000000')
+64
+>>> int2('1010101')
+85
+>>> import functools
+>>> int2 = functools.partial(int, base=2)
+>>> int2('1000000')
+64
+>>> int2('1010101')
+85
+>>> int2('1000000', base=10)
+1000000
+int2 = functools.partial(int, base=2)
+int2('10010')
+相当于：kw = { 'base': 2 }
+int('10010', **kw)
+当传入：max2 = functools.partial(max, 10)
+max2(5, 6, 7)
+相当于：args = (10, 5, 6, 7)
+max(*args)
+do_partial.pydo_partial.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/functional/do_partial.py

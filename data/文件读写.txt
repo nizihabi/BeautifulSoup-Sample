@@ -1,0 +1,31 @@
+读写文件是最常见的IO操作。Python内置了读写文件的函数，用法和C是兼容的。读写文件前，我们先必须了解一下，在磁盘上读写文件的功能都是由操作系统提供的，现代操作系统不允许普通的程序直接操作磁盘，所以，读写文件就是请求操作系统打开一个文件对象（通常称为文件描述符），然后，通过操作系统提供的接口从这个文件对象中读取数据（读文件），或者把数据写入这个文件对象（写文件）。>>> f = open('/Users/michael/test.txt', 'r')
+标示符'r'表示读，这样，我们就成功地打开了一个文件。>>> f=open('/Users/michael/notfound.txt', 'r')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/michael/notfound.txt'
+>>> f.read()
+'Hello, world!'
+>>> f.close()
+try:
+    f = open('/path/to/file', 'r')
+    print(f.read())
+finally:
+    if f:
+        f.close()
+with open('/path/to/file', 'r') as f:
+    print(f.read())
+for line in f.readlines():
+    print(line.strip()) # 把末尾的'\n'删掉
+>>> f = open('/Users/michael/test.jpg', 'rb')
+>>> f.read()
+b'\xff\xd8\xff\xe1\x00\x18Exif\x00\x00...' # 十六进制表示的字节
+>>> f = open('/Users/michael/gbk.txt', 'r', encoding='gbk')
+>>> f.read()
+'测试'
+>>> f = open('/Users/michael/gbk.txt', 'r', encoding='gbk', errors='ignore')
+>>> f = open('/Users/michael/test.txt', 'w')
+>>> f.write('Hello, world!')
+>>> f.close()
+with open('/Users/michael/test.txt', 'w') as f:
+    f.write('Hello, world!')
+with_file.pywith_file.pyhttps://github.com/michaelliao/learn-python3/tree/master/samples/io/with_file.py

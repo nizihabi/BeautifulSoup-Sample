@@ -1,0 +1,30 @@
+Base64是一种用64个字符来表示任意二进制数据的方法。Base64的原理很简单，首先，准备一个包含64个字符的数组：['A', 'B', 'C', ... 'a', 'b', 'c', ... '0', '1', ... '+', '/']
+这样我们得到4个数字作为索引，然后查表，获得相应的4个字符，就是编码后的字符串。所以，Base64编码会把3字节的二进制数据编码为4字节的文本数据，长度增加33%，好处是编码后的文本数据可以在邮件正文、网页等直接显示。>>> import base64
+>>> base64.b64encode(b'binary\x00string')
+b'YmluYXJ5AHN0cmluZw=='
+>>> base64.b64decode(b'YmluYXJ5AHN0cmluZw==')
+b'binary\x00string'
+>>> base64.b64encode(b'i\xb7\x1d\xfb\xef\xff')
+b'abcd++//'
+>>> base64.urlsafe_b64encode(b'i\xb7\x1d\xfb\xef\xff')
+b'abcd--__'
+>>> base64.urlsafe_b64decode('abcd--__')
+b'i\xb7\x1d\xfb\xef\xff'
+还可以自己定义64个字符的排列顺序，这样就可以自定义Base64编码，不过，通常情况下完全没有必要。Base64是一种通过查表的编码方法，不能用于加密，即使使用自定义的编码表也不行。Base64适用于小段内容的编码，比如数字证书签名、Cookie的内容等。# 标准Base64:
+'abcd' -> 'YWJjZA=='
+# 自动去掉=:
+'abcd' -> 'YWJjZA'
+Base64是一种任意二进制到文本字符串的编码方法，常用于在URL、Cookie、网页中传输少量二进制数据。
+# -*- coding: utf-8 -*-
+
+import base64
+
+def safe_base64_decode(s):
+----
+    pass
+----
+# 测试:
+assert b'abcd' == safe_base64_decode(b'YWJjZA=='), safe_base64_decode('YWJjZA==')
+assert b'abcd' == safe_base64_decode(b'YWJjZA'), safe_base64_decode('YWJjZA')
+print('Pass')
+do_base64.pydo_base64.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/commonlib/do_base64.py

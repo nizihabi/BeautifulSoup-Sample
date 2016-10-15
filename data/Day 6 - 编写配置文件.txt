@@ -1,0 +1,30 @@
+有了Web框架和ORM框架，我们就可以开始装配App了。通常，一个Web App在运行时都需要读取配置文件，比如数据库的用户名、口令等，在不同的环境中运行时，Web App可以通过读取不同的配置文件来获得正确的配置。默认的配置文件应该完全符合本地开发环境，这样，无需任何设置，就可以立刻启动服务器。# config_default.py
+
+configs = {
+    'db': {
+        'host': '127.0.0.1',
+        'port': 3306,
+        'user': 'www-data',
+        'password': 'www-data',
+        'database': 'awesome'
+    },
+    'session': {
+        'secret': 'AwEsOmE'
+    }
+}
+# config_override.py
+
+configs = {
+    'db': {
+        'host': '192.168.0.100'
+    }
+}
+# config.py
+configs = config_default.configs
+
+try:
+    import config_override
+    configs = merge(configs, config_override.configs)
+except ImportError:
+    pass
+这样，我们就完成了App的配置。day-06day-06https://github.com/michaelliao/awesome-python3-webapp/tree/day-06

@@ -1,0 +1,10 @@
+让我们对比一下上一节的代码：@asyncio.coroutine
+def hello():
+    print("Hello world!")
+    r = yield from asyncio.sleep(1)
+    print("Hello again!")
+用新语法重新编写如下：async def hello():
+    print("Hello world!")
+    r = await asyncio.sleep(1)
+    print("Hello again!")
+剩下的代码保持不变。注意新语法只能用在Python 3.5以及后续版本，如果使用3.4版本，则仍需使用上一节的方案。将上一节的异步获取sina、sohu和163的网站首页源码用新语法重写并运行。async_hello2.pyasync_hello2.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/async/async_hello2.pyasync_wget2.pyasync_wget2.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/async/async_wget2.py

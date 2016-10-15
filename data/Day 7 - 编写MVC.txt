@@ -1,0 +1,22 @@
+现在，ORM框架、Web框架和配置都已就绪，我们可以开始编写一个最简单的MVC，把它们全部启动起来。@get('/')
+def index(request):
+    users = yield from User.findAll()
+    return {
+        '__template__': 'test.html',
+        'users': users
+    }
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Test users - Awesome Python Webapp</title>
+</head>
+<body>
+    <h1>All users</h1>
+    {% for u in users %}
+    <p>{{ u.name }} / {{ u.email }}</p>
+    {% endfor %}
+</body>
+</html>
+接下来，如果一切顺利，可以用命令行启动Web服务器：$ python3 app.py
+day-07day-07https://github.com/michaelliao/awesome-python3-webapp/tree/day-07

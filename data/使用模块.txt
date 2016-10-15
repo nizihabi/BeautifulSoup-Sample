@@ -1,0 +1,47 @@
+Python本身就内置了很多非常有用的模块，只要安装完毕，这些模块就可以立刻使用。#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+' a test module '
+
+__author__ = 'Michael Liao'
+
+import sys
+
+def test():
+    args = sys.argv
+    if len(args)==1:
+            print('Hello, world!')
+    elif len(args)==2:
+        print('Hello, %s!' % args[1])
+    else:
+        print('Too many arguments!')
+
+if __name__=='__main__':
+    test()
+第4行是一个字符串，表示模块的文档注释，任何模块代码的第一个字符串都被视为模块的文档注释；以上就是Python模块的标准文件模板，当然也可以全部删掉不写，但是，按标准办事肯定没错。后面开始就是真正的代码部分。import sys
+最后，注意到这两行代码：if __name__=='__main__':
+    test()
+$ python3 hello.py
+Hello, world!
+$ python hello.py Michael
+Hello, Michael!
+$ python3
+Python 3.4.3 (v3.4.3:9b73f1c3e601, Feb 23 2015, 02:52:03) 
+[GCC 4.2.1 (Apple Inc. build 5666) (dot 3)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import hello
+>>>
+>>> hello.test()
+Hello, world!
+之所以我们说，private函数和变量“不应该”被直接引用，而不是“不能”被直接引用，是因为Python并没有一种方法可以完全限制访问private函数或变量，但是，从编程习惯上不应该引用private函数或变量。private函数或变量不应该被别人引用，那它们有什么用呢？请看例子：def _private_1(name):
+    return 'Hello, %s' % name
+
+def _private_2(name):
+    return 'Hi, %s' % name
+
+def greeting(name):
+    if len(name) > 3:
+        return _private_1(name)
+    else:
+        return _private_2(name)
+外部不需要引用的函数全部定义成private，只有外部需要引用的函数才定义为public。

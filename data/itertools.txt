@@ -1,0 +1,50 @@
+>>> import itertools
+>>> natuals = itertools.count(1)
+>>> for n in natuals:
+...     print(n)
+...
+1
+2
+3
+...
+>>> import itertools
+>>> cs = itertools.cycle('ABC') # 注意字符串也是序列的一种
+>>> for c in cs:
+...     print(c)
+...
+'A'
+'B'
+'C'
+'A'
+'B'
+'C'
+...
+同样停不下来。>>> ns = itertools.repeat('A', 3)
+>>> for n in ns:
+...     print(n)
+...
+A
+A
+A
+>>> natuals = itertools.count(1)
+>>> ns = itertools.takewhile(lambda x: x <= 10, natuals)
+>>> list(ns)
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+>>> for c in itertools.chain('ABC', 'XYZ'):
+...     print(c)
+# 迭代效果：'A' 'B' 'C' 'X' 'Y' 'Z'
+>>> for key, group in itertools.groupby('AAABBBCCAAA'):
+...     print(key, list(group))
+...
+A ['A', 'A', 'A']
+B ['B', 'B', 'B']
+C ['C', 'C']
+A ['A', 'A', 'A']
+>>> for key, group in itertools.groupby('AaaBBbcCAAa', lambda c: c.upper()):
+...     print(key, list(group))
+...
+A ['A', 'a', 'a']
+B ['B', 'B', 'b']
+C ['c', 'C']
+A ['A', 'A', 'a']
+use_itertools.pyuse_itertools.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/commonlib/use_itertools.py

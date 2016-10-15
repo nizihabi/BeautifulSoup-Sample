@@ -1,0 +1,80 @@
+MapReduce: Simplified Data Processing on Large Clustershttp://research.google.com/archive/mapreduce.html2现在，我们用Python代码实现：>>> def f(x):
+...     return x * x
+...
+>>> r = map(f, [1, 2, 3, 4, 5, 6, 7, 8, 9])
+>>> list(r)
+[1, 4, 9, 16, 25, 36, 49, 64, 81]
+L = []
+for n in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
+    L.append(f(n))
+print(L)
+的确可以，但是，从上面的循环代码，能一眼看明白“把f(x)作用在list的每一个元素并把结果生成一个新的list”吗？2>>> list(map(str, [1, 2, 3, 4, 5, 6, 7, 8, 9]))
+['1', '2', '3', '4', '5', '6', '7', '8', '9']
+只需要一行代码。reduce(f, [x1, x2, x3, x4]) = f(f(f(x1, x2), x3), x4)
+>>> from functools import reduce
+>>> def add(x, y):
+...     return x + y
+...
+>>> reduce(add, [1, 3, 5, 7, 9])
+25
+>>> from functools import reduce
+>>> def fn(x, y):
+...     return x * 10 + y
+...
+>>> reduce(fn, [1, 3, 5, 7, 9])
+13579
+>>> from functools import reduce
+>>> def fn(x, y):
+...     return x * 10 + y
+...
+>>> def char2num(s):
+...     return {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9}[s]
+...
+>>> reduce(fn, map(char2num, '13579'))
+13579
+from functools import reduce
+
+def str2int(s):
+    def fn(x, y):
+        return x * 10 + y
+    def char2num(s):
+        return {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9}[s]
+    return reduce(fn, map(char2num, s))
+还可以用lambda函数进一步简化成：from functools import reduce
+
+def char2num(s):
+    return {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9}[s]
+
+def str2int(s):
+    return reduce(lambda x, y: x * 10 + y, map(char2num, s))
+lambda函数的用法在后面介绍。
+# -*- coding: utf-8 -*-
+----
+def normalize(name):
+    pass
+----
+# 测试:
+L1 = ['adam', 'LISA', 'barT']
+L2 = list(map(normalize, L1))
+print(L2)
+
+# -*- coding: utf-8 -*-
+
+from functools import reduce
+
+def prod(L):
+----
+    pass
+----
+print('3 * 5 * 7 * 9 =', prod([3, 5, 7, 9]))
+
+# -*- coding: utf-8 -*-
+
+from functools import reduce
+
+def str2float(s):
+----
+    pass
+----
+print('str2float(\'123.456\') =', str2float('123.456'))
+do_map.pydo_map.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/functional/do_map.pydo_reduce.pydo_reduce.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/functional/do_reduce.py

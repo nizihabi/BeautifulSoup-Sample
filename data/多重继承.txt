@@ -1,0 +1,42 @@
+继承是面向对象编程的一个重要的方式，因为通过继承，子类就可以扩展父类的功能。Dog - 狗狗；Bat - 蝙蝠；Parrot - 鹦鹉；Ostrich - 鸵鸟。如果按照哺乳动物和鸟类归类，我们可以设计出这样的类的层次：但是如果按照“能跑”和“能飞”来归类，我们就应该设计出这样的类的层次：如果要把上面的两种分类都包含进来，我们就得设计更多的层次：哺乳类：能跑的哺乳类，能飞的哺乳类；鸟类：能跑的鸟类，能飞的鸟类。这么一来，类的层次就复杂了：如果要再增加“宠物类”和“非宠物类”，这么搞下去，类的数量会呈指数增长，很明显这样设计是不行的。正确的做法是采用多重继承。首先，主要的类层次仍按照哺乳类和鸟类设计：class Animal(object):
+    pass
+
+# 大类:
+class Mammal(Animal):
+    pass
+
+class Bird(Animal):
+    pass
+
+# 各种动物:
+class Dog(Mammal):
+    pass
+
+class Bat(Mammal):
+    pass
+
+class Parrot(Bird):
+    pass
+
+class Ostrich(Bird):
+    pass
+class Runnable(object):
+    def run(self):
+        print('Running...')
+
+class Flyable(object):
+    def fly(self):
+        print('Flying...')
+class Dog(Mammal, Runnable):
+    pass
+class Bat(Mammal, Flyable):
+    pass
+通过多重继承，一个子类就可以同时获得多个父类的所有功能。class Dog(Mammal, RunnableMixIn, CarnivorousMixIn):
+    pass
+MixIn的目的就是给一个类增加多个功能，这样，在设计类的时候，我们优先考虑通过多重继承来组合多个MixIn的功能，而不是设计多层次的复杂的继承关系。比如，编写一个多进程模式的TCP服务，定义如下：class MyTCPServer(TCPServer, ForkingMixIn):
+    pass
+编写一个多线程模式的UDP服务，定义如下：class MyUDPServer(UDPServer, ThreadingMixIn):
+    pass
+class MyTCPServer(TCPServer, CoroutineMixIn):
+    pass
+这样一来，我们不需要复杂而庞大的继承链，只要选择组合不同的类的功能，就可以快速构造出所需的子类。由于Python允许使用多重继承，因此，MixIn就是一种常见的设计。只允许单一继承的语言（如Java）不能使用MixIn的设计。

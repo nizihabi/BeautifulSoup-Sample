@@ -1,0 +1,173 @@
+用错误码来表示是否出错十分不便，因为函数本身应该返回的正常结果和错误码混在一起，造成调用者必须用大量的代码来判断是否出错：def foo():
+    r = some_function()
+    if r==(-1):
+        return (-1)
+    # do something
+    return r
+
+def bar():
+    r = foo()
+    if r==(-1):
+        print('Error')
+    else:
+        pass
+一旦出错，还要一级一级上报，直到某个函数可以处理该错误（比如，给用户输出一个错误信息）。try:
+    print('try...')
+    r = 10 / 0
+    print('result:', r)
+except ZeroDivisionError as e:
+    print('except:', e)
+finally:
+    print('finally...')
+print('END')
+try...
+except: division by zero
+finally...
+END
+try...
+result: 5
+finally...
+END
+try:
+    print('try...')
+    r = 10 / int('a')
+    print('result:', r)
+except ValueError as e:
+    print('ValueError:', e)
+except ZeroDivisionError as e:
+    print('ZeroDivisionError:', e)
+finally:
+    print('finally...')
+print('END')
+try:
+    print('try...')
+    r = 10 / int('2')
+    print('result:', r)
+except ValueError as e:
+    print('ValueError:', e)
+except ZeroDivisionError as e:
+    print('ZeroDivisionError:', e)
+else:
+    print('no error!')
+finally:
+    print('finally...')
+print('END')
+try:
+    foo()
+except ValueError as e:
+    print('ValueError')
+except UnicodeError as e:
+    print('UnicodeError')
+https://docs.python.org/3/library/exceptions.html#exception-hierarchyhttps://docs.python.org/3/library/exceptions.html#exception-hierarchyhttps://docs.python.org/3/library/exceptions.html#exception-hierarchydef foo(s):
+    return 10 / int(s)
+
+def bar(s):
+    return foo(s) * 2
+
+def main():
+    try:
+        bar('0')
+    except Exception as e:
+        print('Error:', e)
+    finally:
+        print('finally...')
+# err.py:
+def foo(s):
+    return 10 / int(s)
+
+def bar(s):
+    return foo(s) * 2
+
+def main():
+    bar('0')
+
+main()
+执行，结果如下：$ python3 err.py
+Traceback (most recent call last):
+  File "err.py", line 11, in <module>
+    main()
+  File "err.py", line 9, in main
+    bar('0')
+  File "err.py", line 6, in bar
+    return foo(s) * 2
+  File "err.py", line 3, in foo
+    return 10 / int(s)
+ZeroDivisionError: division by zero
+出错并不可怕，可怕的是不知道哪里出错了。解读错误信息是定位错误的关键。我们从上往下可以看到整个错误的调用函数链：错误信息第1行：Traceback (most recent call last):
+告诉我们这是错误的跟踪信息。第2~3行：  File "err.py", line 11, in <module>
+    main()
+  File "err.py", line 9, in main
+    bar('0')
+  File "err.py", line 6, in bar
+    return foo(s) * 2
+  File "err.py", line 3, in foo
+    return 10 / int(s)
+ZeroDivisionError: integer division or modulo by zero
+如果不捕获错误，自然可以让Python解释器来打印出错误堆栈，但程序也被结束了。既然我们能捕获错误，就可以把错误堆栈打印出来，然后分析错误原因，同时，让程序继续执行下去。# err_logging.py
+
+import logging
+
+def foo(s):
+    return 10 / int(s)
+
+def bar(s):
+    return foo(s) * 2
+
+def main():
+    try:
+        bar('0')
+    except Exception as e:
+        logging.exception(e)
+
+main()
+print('END')
+同样是出错，但程序打印完错误信息后会继续执行，并正常退出：$ python3 err_logging.py
+ERROR:root:division by zero
+Traceback (most recent call last):
+  File "err_logging.py", line 13, in main
+    bar('0')
+  File "err_logging.py", line 9, in bar
+    return foo(s) * 2
+  File "err_logging.py", line 6, in foo
+    return 10 / int(s)
+ZeroDivisionError: division by zero
+END
+因为错误是class，捕获一个错误就是捕获到该class的一个实例。因此，错误并不是凭空产生的，而是有意创建并抛出的。Python的内置函数会抛出很多类型的错误，我们自己编写的函数也可以抛出错误。# err_raise.py
+class FooError(ValueError):
+    pass
+
+def foo(s):
+    n = int(s)
+    if n==0:
+        raise FooError('invalid value: %s' % s)
+    return 10 / n
+
+foo('0')
+执行，可以最后跟踪到我们自己定义的错误：$ python3 err_raise.py 
+Traceback (most recent call last):
+  File "err_throw.py", line 11, in <module>
+    foo('0')
+  File "err_throw.py", line 8, in foo
+    raise FooError('invalid value: %s' % s)
+__main__.FooError: invalid value: 0
+最后，我们来看另一种错误处理的方式：# err_reraise.py
+
+def foo(s):
+    n = int(s)
+    if n==0:
+        raise ValueError('invalid value: %s' % s)
+    return 10 / n
+
+def bar():
+    try:
+        foo('0')
+    except ValueError as e:
+        print('ValueError!')
+        raise
+
+bar()
+其实这种错误处理方式不但没病，而且相当常见。捕获错误目的只是记录一下，便于后续追踪。但是，由于当前函数不知道应该怎么处理该错误，所以，最恰当的方式是继续往上抛，让顶层调用者去处理。好比一个员工处理不了一个问题时，就把问题抛给他的老板，如果他的老板也处理不了，就一直往上抛，最终会抛给CEO去处理。try:
+    10 / 0
+except ZeroDivisionError:
+    raise ValueError('input error!')
+程序也可以主动抛出错误，让调用者来处理相应的错误。但是，应该在文档中写清楚可能会抛出哪些错误，以及错误产生的原因。do_try.pydo_try.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/debug/do_try.pyerr.pyerr.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/debug/err.pyerr_logging.pyerr_logging.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/debug/err_logging.pyerr_raise.pyerr_raise.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/debug/err_raise.pyerr_reraise.pyerr_reraise.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/debug/err_reraise.py

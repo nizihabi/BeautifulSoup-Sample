@@ -1,0 +1,17 @@
+>>> n = 10240099
+>>> b1 = (n & 0xff000000) >> 24
+>>> b2 = (n & 0xff0000) >> 16
+>>> b3 = (n & 0xff00) >> 8
+>>> b4 = n & 0xff
+>>> bs = bytes([b1, b2, b3, b4])
+>>> bs
+b'\x00\x9c@c'
+非常麻烦。如果换成浮点数就无能为力了。>>> import struct
+>>> struct.pack('>I', 10240099)
+b'\x00\x9c@c'
+后面的参数个数要和处理指令一致。>>> struct.unpack('>IH', b'\xf0\xf0\xf0\xf0\x80\x80')
+(4042322160, 32896)
+https://docs.python.org/3/library/struct.html#format-charactershttps://docs.python.org/3/library/struct.html#format-charactershttps://docs.python.org/3/library/struct.html#format-characters首先找一个bmp文件，没有的话用“画图”画一个。读入前30个字节来分析：>>> s = b'\x42\x4d\x38\x8c\x0a\x00\x00\x00\x00\x00\x36\x00\x00\x00\x28\x00\x00\x00\x80\x02\x00\x00\x68\x01\x00\x00\x01\x00\x18\x00'
+BMP格式采用小端方式存储数据，文件头的结构按顺序如下：>>> struct.unpack('<ccIIIIIIHH', s)
+(b'B', b'M', 691256, 0, 54, 40, 640, 360, 1, 24)
+check_bmp.pycheck_bmp.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/commonlib/check_bmp.py

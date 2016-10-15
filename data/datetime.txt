@@ -1,0 +1,91 @@
+datetime是Python处理日期和时间的标准库。我们先看如何获取当前日期和时间：>>> from datetime import datetime
+>>> now = datetime.now() # 获取当前datetime
+>>> print(now)
+2015-05-18 16:28:07.198690
+>>> print(type(now))
+<class 'datetime.datetime'>
+>>> from datetime import datetime
+>>> dt = datetime(2015, 4, 19, 12, 20) # 用指定日期时间创建datetime
+>>> print(dt)
+2015-04-19 12:20:00
+你可以认为：timestamp = 0 = 1970-1-1 00:00:00 UTC+0:00
+对应的北京时间是：timestamp = 0 = 1970-1-1 08:00:00 UTC+8:00
+可见timestamp的值与时区毫无关系，因为timestamp一旦确定，其UTC时间就确定了，转换到任意时区的时间也是完全确定的，这就是为什么计算机存储的当前时间是以timestamp表示的，因为全球各地的计算机在任意时刻的timestamp都是完全相同的（假定时间已校准）。>>> from datetime import datetime
+>>> dt = datetime(2015, 4, 19, 12, 20) # 用指定日期时间创建datetime
+>>> dt.timestamp() # 把datetime转换为timestamp
+1429417200.0
+注意Python的timestamp是一个浮点数。如果有小数位，小数位表示毫秒数。某些编程语言（如Java和JavaScript）的timestamp使用整数表示毫秒数，这种情况下只需要把timestamp除以1000就得到Python的浮点表示方法。>>> from datetime import datetime
+>>> t = 1429417200.0
+>>> print(datetime.fromtimestamp(t))
+2015-04-19 12:20:00
+注意到timestamp是一个浮点数，它没有时区的概念，而datetime是有时区的。上述转换是在timestamp和本地时间做转换。本地时间是指当前操作系统设定的时区。例如北京时区是东8区，则本地时间：2015-04-19 12:20:00
+实际上就是UTC+8:00时区的时间：2015-04-19 12:20:00 UTC+8:00
+而此刻的格林威治标准时间与北京时间差了8小时，也就是UTC+0:00时区的时间应该是：2015-04-19 04:20:00 UTC+0:00
+timestamp也可以直接被转换到UTC标准时区的时间：>>> from datetime import datetime
+>>> t = 1429417200.0
+>>> print(datetime.fromtimestamp(t)) # 本地时间
+2015-04-19 12:20:00
+>>> print(datetime.utcfromtimestamp(t)) # UTC时间
+2015-04-19 04:20:00
+>>> from datetime import datetime
+>>> cday = datetime.strptime('2015-6-1 18:19:59', '%Y-%m-%d %H:%M:%S')
+>>> print(cday)
+2015-06-01 18:19:59
+Python文档https://docs.python.org/3/library/datetime.html#strftime-strptime-behavior注意转换后的datetime是没有时区信息的。>>> from datetime import datetime
+>>> now = datetime.now()
+>>> print(now.strftime('%a, %b %d %H:%M'))
+Mon, May 05 16:28
+>>> from datetime import datetime, timedelta
+>>> now = datetime.now()
+>>> now
+datetime.datetime(2015, 5, 18, 16, 57, 3, 540997)
+>>> now + timedelta(hours=10)
+datetime.datetime(2015, 5, 19, 2, 57, 3, 540997)
+>>> now - timedelta(days=1)
+datetime.datetime(2015, 5, 17, 16, 57, 3, 540997)
+>>> now + timedelta(days=2, hours=12)
+datetime.datetime(2015, 5, 21, 4, 57, 3, 540997)
+本地时间是指系统设定时区的时间，例如北京时间是UTC+8:00时区的时间，而UTC时间指UTC+0:00时区的时间。>>> from datetime import datetime, timedelta, timezone
+>>> tz_utc_8 = timezone(timedelta(hours=8)) # 创建时区UTC+8:00
+>>> now = datetime.now()
+>>> now
+datetime.datetime(2015, 5, 18, 17, 2, 10, 871012)
+>>> dt = now.replace(tzinfo=tz_utc_8) # 强制设置为UTC+8:00
+>>> dt
+datetime.datetime(2015, 5, 18, 17, 2, 10, 871012, tzinfo=datetime.timezone(datetime.timedelta(0, 28800)))
+如果系统时区恰好是UTC+8:00，那么上述代码就是正确的，否则，不能强制设置为UTC+8:00时区。# 拿到UTC时间，并强制设置时区为UTC+0:00:
+>>> utc_dt = datetime.utcnow().replace(tzinfo=timezone.utc)
+>>> print(utc_dt)
+2015-05-18 09:05:12.377316+00:00
+# astimezone()将转换时区为北京时间:
+>>> bj_dt = utc_dt.astimezone(timezone(timedelta(hours=8)))
+>>> print(bj_dt)
+2015-05-18 17:05:12.377316+08:00
+# astimezone()将转换时区为东京时间:
+>>> tokyo_dt = utc_dt.astimezone(timezone(timedelta(hours=9)))
+>>> print(tokyo_dt)
+2015-05-18 18:05:12.377316+09:00
+# astimezone()将bj_dt转换时区为东京时间:
+>>> tokyo_dt2 = bj_dt.astimezone(timezone(timedelta(hours=9)))
+>>> print(tokyo_dt2)
+2015-05-18 18:05:12.377316+09:00
+
+# -*- coding:utf-8 -*-
+
+import re
+from datetime import datetime, timezone, timedelta
+
+def to_timestamp(dt_str, tz_str):
+----
+    pass
+----
+# 测试:
+
+t1 = to_timestamp('2015-6-1 08:10:30', 'UTC+7:00')
+assert t1 == 1433121030.0, t1
+
+t2 = to_timestamp('2015-5-31 16:10:30', 'UTC-09:00')
+assert t2 == 1433121030.0, t2
+
+print('Pass')
+use_datetime.pyuse_datetime.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/commonlib/use_datetime.py

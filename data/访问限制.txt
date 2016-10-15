@@ -1,0 +1,51 @@
+在Class内部，可以有属性和方法，而外部代码可以通过直接调用实例变量的方法来操作数据，这样，就隐藏了内部的复杂逻辑。>>> bart = Student('Bart Simpson', 98)
+>>> bart.score
+98
+>>> bart.score = 59
+>>> bart.score
+59
+class Student(object):
+
+    def __init__(self, name, score):
+        self.__name = name
+        self.__score = score
+
+    def print_score(self):
+        print('%s: %s' % (self.__name, self.__score))
+>>> bart = Student('Bart Simpson', 98)
+>>> bart.__name
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'Student' object has no attribute '__name'
+这样就确保了外部代码不能随意修改对象内部的状态，这样通过访问限制的保护，代码更加健壮。class Student(object):
+    ...
+
+    def get_name(self):
+        return self.__name
+
+    def get_score(self):
+        return self.__score
+class Student(object):
+    ...
+
+    def set_score(self, score):
+        self.__score = score
+class Student(object):
+    ...
+
+    def set_score(self, score):
+        if 0 <= score <= 100:
+            self.__score = score
+        else:
+            raise ValueError('bad score')
+>>> bart._Student__name
+'Bart Simpson'
+总的来说就是，Python本身没有任何机制阻止你干坏事，一切全靠自觉。最后注意下面的这种错误写法：>>> bart = Student('Bart Simpson', 98)
+>>> bart.get_name()
+'Bart Simpson'
+>>> bart.__name = 'New Name' # 设置__name变量！
+>>> bart.__name
+'New Name'
+>>> bart.get_name() # get_name()内部返回self.__name
+'Bart Simpson'
+protected_student.pyprotected_student.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/oop_basic/protected_student.py

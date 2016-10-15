@@ -1,0 +1,41 @@
+例如，在一个list中，删掉偶数，只保留奇数，可以这么写：def is_odd(n):
+    return n % 2 == 1
+
+list(filter(is_odd, [1, 2, 4, 5, 6, 9, 10, 15]))
+# 结果: [1, 5, 9, 15]
+把一个序列中的空字符串删掉，可以这么写：def not_empty(s):
+    return s and s.strip()
+
+list(filter(not_empty, ['A', '', 'B', None, 'C', '  ']))
+# 结果: ['A', 'B', 'C']
+素数http://baike.baidu.com/view/10626.htm埃氏筛法http://baike.baidu.com/view/3784258.htm2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...不断筛下去，就可以得到所有的素数。def _odd_iter():
+    n = 1
+    while True:
+        n = n + 2
+        yield n
+注意这是一个生成器，并且是一个无限序列。然后定义一个筛选函数：def _not_divisible(n):
+    return lambda x: x % n > 0
+最后，定义一个生成器，不断返回下一个素数：def primes():
+    yield 2
+    it = _odd_iter() # 初始序列
+    while True:
+        n = next(it) # 返回序列的第一个数
+        yield n
+        it = filter(_not_divisible(n), it) # 构造新序列
+# 打印1000以内的素数:
+for n in primes():
+    if n < 1000:
+        print(n)
+    else:
+        break
+
+# -*- coding: utf-8 -*-
+
+def is_palindrome(n):
+----
+    pass
+----
+# 测试:
+output = filter(is_palindrome, range(1, 1000))
+print(list(output))
+do_filter.pydo_filter.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/functional/do_filter.pyprime_numbers.pyprime_numbers.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/functional/prime_numbers.py

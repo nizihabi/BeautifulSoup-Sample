@@ -1,0 +1,30 @@
+本节列出常见的一些问题。# -*- coding:utf-8 -*-
+# test.py
+
+import os
+
+print(os.path.abspath('.'))
+运行结果：$ python3 test.py 
+/Users/michael/workspace/testing
+# -*- coding:utf-8 -*-
+# test.py
+
+print(__file__)
+输出：$ python3 test.py
+test.py
+# -*- coding:utf-8 -*-
+# test.py
+
+import sys
+
+print(sys.argv)
+输出：$ python3 test.py -a -s "Hello world"
+['test.py', '-a', '-s', 'Hello world']
+# -*- coding:utf-8 -*-
+# test.py
+
+import sys
+
+print(sys.executable)
+在Mac下的结果：$ python3 test.py 
+/usr/local/opt/python3/bin/python3.4

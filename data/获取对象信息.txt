@@ -1,0 +1,113 @@
+当我们拿到一个对象的引用时，如何知道这个对象是什么类型、有哪些方法呢？>>> type(123)
+<class 'int'>
+>>> type('str')
+<class 'str'>
+>>> type(None)
+<type(None) 'NoneType'>
+>>> type(abs)
+<class 'builtin_function_or_method'>
+>>> type(a)
+<class '__main__.Animal'>
+>>> type(123)==type(456)
+True
+>>> type(123)==int
+True
+>>> type('abc')==type('123')
+True
+>>> type('abc')==str
+True
+>>> type('abc')==type(123)
+False
+>>> import types
+>>> def fn():
+...     pass
+...
+>>> type(fn)==types.FunctionType
+True
+>>> type(abs)==types.BuiltinFunctionType
+True
+>>> type(lambda x: x)==types.LambdaType
+True
+>>> type((x for x in range(10)))==types.GeneratorType
+True
+我们回顾上次的例子，如果继承关系是：object -> Animal -> Dog -> Husky
+>>> a = Animal()
+>>> d = Dog()
+>>> h = Husky()
+然后，判断：>>> isinstance(h, Husky)
+True
+再判断：>>> isinstance(h, Dog)
+True
+>>> isinstance(h, Animal)
+True
+>>> isinstance(d, Dog) and isinstance(d, Animal)
+True
+>>> isinstance(d, Husky)
+False
+>>> isinstance('a', str)
+True
+>>> isinstance(123, int)
+True
+>>> isinstance(b'a', bytes)
+True
+并且还可以判断一个变量是否是某些类型中的一种，比如下面的代码就可以判断是否是list或者tuple：>>> isinstance([1, 2, 3], (list, tuple))
+True
+>>> isinstance((1, 2, 3), (list, tuple))
+True
+>>> dir('ABC')
+['__add__', '__class__', '__contains__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__', '__getnewargs__', '__gt__', '__hash__', '__init__', '__iter__', '__le__', '__len__', '__lt__', '__mod__', '__mul__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__rmod__', '__rmul__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', 'capitalize', 'casefold', 'center', 'count', 'encode', 'endswith', 'expandtabs', 'find', 'format', 'format_map', 'index', 'isalnum', 'isalpha', 'isdecimal', 'isdigit', 'isidentifier', 'islower', 'isnumeric', 'isprintable', 'isspace', 'istitle', 'isupper', 'join', 'ljust', 'lower', 'lstrip', 'maketrans', 'partition', 'replace', 'rfind', 'rindex', 'rjust', 'rpartition', 'rsplit', 'rstrip', 'split', 'splitlines', 'startswith', 'strip', 'swapcase', 'title', 'translate', 'upper', 'zfill']
+>>> len('ABC')
+3
+>>> 'ABC'.__len__()
+3
+>>> class MyDog(object):
+...     def __len__(self):
+...         return 100
+...
+>>> dog = MyDog()
+>>> len(dog)
+100
+>>> 'ABC'.lower()
+'abc'
+>>> class MyObject(object):
+...     def __init__(self):
+...         self.x = 9
+...     def power(self):
+...         return self.x * self.x
+...
+>>> obj = MyObject()
+紧接着，可以测试该对象的属性：>>> hasattr(obj, 'x') # 有属性'x'吗？
+True
+>>> obj.x
+9
+>>> hasattr(obj, 'y') # 有属性'y'吗？
+False
+>>> setattr(obj, 'y', 19) # 设置一个属性'y'
+>>> hasattr(obj, 'y') # 有属性'y'吗？
+True
+>>> getattr(obj, 'y') # 获取属性'y'
+19
+>>> obj.y # 获取属性'y'
+19
+如果试图获取不存在的属性，会抛出AttributeError的错误：>>> getattr(obj, 'z') # 获取属性'z'
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: 'MyObject' object has no attribute 'z'
+可以传入一个default参数，如果属性不存在，就返回默认值：>>> getattr(obj, 'z', 404) # 获取属性'z'，如果不存在，返回默认值404
+404
+也可以获得对象的方法：>>> hasattr(obj, 'power') # 有属性'power'吗？
+True
+>>> getattr(obj, 'power') # 获取属性'power'
+<bound method MyObject.power of <__main__.MyObject object at 0x10077a6a0>>
+>>> fn = getattr(obj, 'power') # 获取属性'power'并赋值到变量fn
+>>> fn # fn指向obj.power
+<bound method MyObject.power of <__main__.MyObject object at 0x10077a6a0>>
+>>> fn() # 调用fn()与调用obj.power()是一样的
+81
+通过内置的一系列函数，我们可以对任意一个Python对象进行剖析，拿到其内部的数据。要注意的是，只有在不知道对象信息的时候，我们才会去获取对象信息。如果可以直接写：sum = obj.x + obj.y
+就不要写：sum = getattr(obj, 'x') + getattr(obj, 'y')
+一个正确的用法的例子如下：def readImage(fp):
+    if hasattr(fp, 'read'):
+        return readData(fp)
+    return None
+get_type.pyget_type.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/oop_basic/get_type.pyattrs.pyattrs.pyhttps://github.com/michaelliao/learn-python3/blob/master/samples/oop_basic/attrs.py
