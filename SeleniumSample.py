@@ -1,3 +1,6 @@
+"""
+使用Selenium模拟浏览器爬取动态页面，对腾讯动漫中海贼王的一些章节进行爬取
+"""
 from selenium import webdriver
 import requests
 import os
@@ -18,16 +21,12 @@ class ChromeBrowser(object):
         self.__browser.quit()
         return soup
 
-    """
-    获取图片链接
-    """
+    #获取图片链接列表
     def getFileList(self,soup):
         return [img["src"]  for img in soup.find_all("img",{"class":"loaded"}) ]
 
 
-    """
-    保存图片到指定目录
-    """
+    #保存图片
     def saveImage(self,imgUrl, dir, imgname):
         if not os.path.exists(dir):
             os.makedirs(dir)
@@ -53,7 +52,7 @@ if __name__ == "__main__":
     for index in range(startIndex,endIndex):  #开始每一章节的爬虫
         mybrowser = ChromeBrowser(chromedriver) #生成一个Chrome浏览器
         dir = "./ImgData/" + str(index) + "/" #保存的目录
-        link = CONSTURL+str(index + offset) #组合url
+        link = CONSTURL + str(index + offset) #组合url
         page = mybrowser.getSoup(link) #获取最后经过js渲染之后的真正的页面内容
         imgs = mybrowser.getFileList(page) #获取每一页的图片
         index = 0
