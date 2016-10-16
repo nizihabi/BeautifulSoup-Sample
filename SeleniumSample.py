@@ -22,8 +22,8 @@ class ChromeBrowser(object):
         return soup
 
     #获取图片链接列表
-    def getFileList(self,soup):
-        return [img["src"]  for img in soup.find_all("img",{"class":"loaded"}) ]
+    def getFileList(self,soup,tag,**kw):
+        return [img["src"]  for img in soup.find_all(tag,**kw) ]
 
 
     #保存图片
@@ -46,7 +46,7 @@ class ChromeBrowser(object):
 if __name__ == "__main__":
     chromedriver = r"./dependence/chromedriver" #selenium的驱动所在
     CONSTURL = "http://ac.qq.com/ComicView/index/id/505430/cid/" #url前面不变的部分
-    startIndex = 810 #开始的章节
+    startIndex = 820 #开始的章节
     endIndex = 843  #结束的章节
     offset = 17 #章节和真正url序号之间的差值
     for index in range(startIndex,endIndex):  #开始每一章节的爬虫
@@ -54,7 +54,7 @@ if __name__ == "__main__":
         dir = "./ImgData/" + str(index) + "/" #保存的目录
         link = CONSTURL + str(index + offset) #组合url
         page = mybrowser.getSoup(link) #获取最后经过js渲染之后的真正的页面内容
-        imgs = mybrowser.getFileList(page) #获取每一页的图片
+        imgs = mybrowser.getFileList(page,"img",**{"class":"loaded"}) #获取每一页的图片
         index = 0
         for img in imgs:
             imgName = str(index) + ".jpg"
@@ -62,3 +62,4 @@ if __name__ == "__main__":
             index += 1
 
     print("已经下载完成")
+
