@@ -1,3 +1,6 @@
+"""
+使用Selenium模拟浏览器爬取动态页面，对腾讯动漫中海贼王的一些章节进行爬取
+"""
 from selenium import webdriver
 import requests
 import os
@@ -22,16 +25,12 @@ class ChromeBrowser(object):
         except:
             return None
 
-    """
-    获取图片链接
-    """
-    def getFileList(self,soup):
-        return [img["src"]  for img in soup.find_all("img",{"class":"loaded"}) ]
+    #获取图片链接列表
+    def getFileList(self,soup,tag,**kw):
+        return [img["src"]  for img in soup.find_all(tag,**kw) ]
 
 
-    """
-    保存图片到指定目录
-    """
+    #保存图片
     def saveImage(self,imgUrl, dir, imgname):
         if not os.path.exists(dir):
             os.makedirs(dir)
@@ -56,6 +55,7 @@ class ChromeBrowser(object):
 if __name__ == "__main__":
     chromedriver = r"./dependence/chromedriver" #selenium的驱动所在
     CONSTURL = "http://ac.qq.com/ComicView/index/id/505430/cid/" #url前面不变的部分
+
     startIndex = 810 #开始的章节
     endIndex = 844  #结束的章节
     offset = 17 #章节和真正url序号之间的差值
@@ -69,5 +69,22 @@ if __name__ == "__main__":
         imgs = mybrowser.getFileList(page) #获取每一页的图片
         t = threading.Thread(target=mybrowser.downLoadThread, args=( dir,imgs))
         t.start()
+'''
+    startIndex = 820 #开始的章节
+    endIndex = 843  #结束的章节
+    offset = 17 #章节和真正url序号之间的差值
+    for index in range(startIndex,endIndex):  #开始每一章节的爬虫
+        mybrowser = ChromeBrowser(chromedriver) #生成一个Chrome浏览器
+        dir = "./ImgData/" + str(index) + "/" #保存的目录
+        link = CONSTURL + str(index + offset) #组合url
+        page = mybrowser.getSoup(link) #获取最后经过js渲染之后的真正的页面内容
+        imgs = mybrowser.getFileList(page,"img",**{"class":"loaded"}) #获取每一页的图片
+        index = 0
+        for img in imgs:
+            imgName = str(index) + ".jpg"
+            mybrowser.saveImage(img, dir, imgName)
+            index += 1
+'''
 
     print("已经下载完成")
+
